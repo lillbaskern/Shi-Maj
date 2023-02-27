@@ -6,16 +6,14 @@ using UnityEngine.InputSystem;
 public class PlayerMove : MonoBehaviour
 {
     Camera _cam;
-    public float Sensitivity = 4;
-
-
-    [SerializeField] CharacterController _cc;
+    public float LookSensitivity = 4;
+    CharacterController _cc;
 
 
 
     [SerializeField] float _jumpHeight = 1;
     [SerializeField] float _fallSpeed = 0.5f;
-    [SerializeField] float _moveSpeed;
+    [SerializeField] float _moveSpeed = 5f;
 
 
     [SerializeField] Vector2 _inputDir;

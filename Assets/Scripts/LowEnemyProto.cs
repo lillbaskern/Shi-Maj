@@ -4,9 +4,10 @@ using UnityEngine;
 
 public class LowEnemyProto : MonoBehaviour
 {
+
     GameObject _player;
-    public int Damage = 3; 
-    [SerializeField]float MoveSpeed = 3;
+    public int Damage = 3;
+    [SerializeField] float MoveSpeed = 3;
     void Start()
     {
         _player = GameObject.FindGameObjectWithTag("Player");
@@ -16,7 +17,9 @@ public class LowEnemyProto : MonoBehaviour
     {
         
     }
-    private void OnCollisionEnter(Collision other) {
-        if(other.gameObject.TryGetComponent<PlayerHead>(out PlayerHead head)) head.TakeDamage(Damage);
+    //if the enemy collides with player, damage player
+    private void OnCollisionEnter(Collision other)
+    {        
+        if (other.gameObject.TryGetComponent<PlayerHead>(out PlayerHead head)) head.TakeDamage(Damage);
     }
 }
