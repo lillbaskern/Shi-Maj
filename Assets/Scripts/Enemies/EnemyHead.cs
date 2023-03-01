@@ -20,16 +20,11 @@ public class EnemyHead : MonoBehaviour
 
     int TakeDamage(int currHP, int incomingDamage)
     {
+        if (currHP - incomingDamage <= 0)
+        {
+            Debug.Log("oop, i died");
+            Destroy(this.gameObject);
+        }
         return currHP - incomingDamage;
-    }
-
-    void Start()
-    {
-
-    }
-
-    void Update()
-    {
-
     }
 }

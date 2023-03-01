@@ -20,6 +20,6 @@ public class LowEnemyProto : MonoBehaviour
     //if the enemy collides with player, damage player
     private void OnCollisionEnter(Collision other)
     {        
-        if (other.gameObject.TryGetComponent<PlayerHead>(out PlayerHead head)) head.TakeDamage(Damage);
+        if (other.gameObject.TryGetComponent<PlayerHead>(out PlayerHead head)) head.HP = Damage;
     }
 }

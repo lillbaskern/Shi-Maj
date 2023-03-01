@@ -3,50 +3,55 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+
 public class Weapon
 {
-    public Weapon(float reloadTime)
+    public Weapon(WeaponData input)
     {
         //TODO: MAKE THIS CONSTRUCTOR DO THINGS BASED ON A SCRIPTABLEOBJECT PROVIDED AS PARAMETER
         IsReloading = false;
 
-        WeaponName = "PISTOL";
-        Damage = 3;
-        MagCapacity = 7;
-        AmmoCapacity = 30;
-        _reloadTime = new WaitForSeconds(reloadTime);
+        WeaponName = input.WeaponName;
+        Damage = input.Damage;
+        MagCapacity = input.BulletsPerMag;
+        AmmoCapacity = input.MaxBulletCapacity;
+        _reloadTime = new WaitForSeconds(input.ReloadTime);
         CurrMag = MagCapacity;
-        Range = 100f;
+        Range = input.Range;
     }
-    public bool IsReloading { get; private set; }
 
-
-    //the name of the weapon. 
+    public bool IsReloading { get; protected set; }
     public string WeaponName { get; private set; }
-    //how much damage the weapon deals
     public int Damage { get; private set; }
+
     //how many bullets are in your current mag
     public int CurrMag;
+
     //how many shots you can fire before needing to reload
     public int MagCapacity { get; private set; }
+
     //how many shots you can carry outside of the bullets in each mag
     public int AmmoCapacity { get; private set; }
-    //the weapon's range
     public float Range { get; private set; }
-    //how long it will take before the player is be able to fire again after running out of bullets in their magazine
     private WaitForSeconds _reloadTime { get; set; }
+
+
     public virtual IEnumerator Reload()
     {
         if (CurrMag == MagCapacity || IsReloading) yield return null;
+
         Debug.Log("Reloading");
         IsReloading = true;
+
         yield return _reloadTime;
+
         CurrMag = MagCapacity;
         IsReloading = false;
-        Debug.Log("DONE reloading");
-        yield return null;
-    }
 
+        yield return null;
+        Debug.Log("DONE reloading");
+    }
+    //how the fuck would you 
     public virtual void Fire(PlayerShoot player, float radius, Vector3 shootPoint)
     {
         CurrMag -= 1;
@@ -78,58 +83,117 @@ public class Weapon
 
 public class PlayerShoot : MonoBehaviour
 {
-    Weapon weapon = new(1.12f);
+    InputHandler inputHandler;
+    Transform _highCrosshair;
+    [SerializeField] GameObject _UiHighCrosshair;
+    public Weapon Weapon { get; private set; }
 
-    //these transforms are from where raycasts will fire,  
+    //these transforms are from where raycasts will fire
     [SerializeField] Transform _lowShootPoint;
     [SerializeField] Transform _highShootPoint;
 
 
     void Start()
     {
+        _lowShootPoint = GameObject.Find("LowShootOrigin").transform;
+        _highShootPoint = GameObject.Find("HighShootOrigin").transform;
+        _highCrosshair = GameObject.Find("HighCrosshairDecal").transform;
+        
         if (_highShootPoint == null || _lowShootPoint == null)
         {
             Debug.LogWarning("NOT ENOUGH SHOOTPOINTS ATTACHED, PLEASE ENSURE THAT YOU HAVE INHABITED LOWSHOOTPOINT AND HIGHSHOOTPOINT WITH ANY TRANSFORM(S)");
-            Debug.Log("Player will now self destruct in 10...9...");
-            Destroy(this.gameObject, 10f);
+            Debug.LogWarning("Player will now self destruct in 10...9...");
+            this.gameObject.SetActive(false);
         }
+
+        _UiHighCrosshair = GameObject.Find("HIGHcrosshair");
     }
 
     void Update()
     {
+        
         //draw ray for debug purposes
         Debug.DrawRay(_lowShootPoint.position, _lowShootPoint.TransformDirection(Vector3.forward) * 100f, Color.blue);
         Debug.DrawRay(_highShootPoint.position, _highShootPoint.TransformDirection(Vector3.forward) * 100f, Color.green);
 
+        ProjectHighCrossHair();
+
         //handle weapon related things after this guard clause
-        if (weapon == null) return;
-        if (weapon.CurrMag <= 0 && !weapon.IsReloading) StartCoroutine(weapon.Reload());
+        if (Weapon == null) return;
+        if (Weapon.CurrMag <= 0 && !Weapon.IsReloading) StartCoroutine(Weapon.Reload());
     }
-    public void OnShootHigh(InputValue val)
+
+
+    private void ProjectHighCrossHair()
+    {
+        //if (_highCrosshair == null) return;
+
+        RaycastHit hit;
+        //to make the raycast work even if you are unarmed, we use a ternary operator to set a new floats value based on whether or not you have a weapon
+        float range = Weapon == null ? 30f : Weapon.Range;
+        if (Physics.Raycast(_highShootPoint.position, transform.TransformDirection(Vector3.forward), out hit, range))
+        {
+            if (hit.distance < 4.57f)
+            {
+                //AS THE CONCEPT GOES, YOUR CHARACTER WILL THROW A GRENADE IF THE ENEMY IS TOO CLOSE FOR THE UPPER CROSSHAIR DECAL TO DISPLAY ON SCREEN
+                //HERE WE ONLY PROJECT THE CROSSHAIR THOUGH, SO ONLY AN INDICATOR THAT THE GRENADE THROW WILL HAPPEN IS NEEDED HERE
+                //MAYBE CHANGE THE CROSSHAIR TO RED?
+                //OTHERWISE, RED CHEVRONS WHICH POINT UPWARD (MAYBE WITH A GRENADE ICON AS WELL?)
+            }
+
+            _highCrosshair.position = hit.point;
+            _highCrosshair.rotation = this.transform.rotation;
+            _highCrosshair.gameObject.SetActive(true);
+            _UiHighCrosshair.SetActive(false);
+            return;
+        }
+        _highCrosshair.gameObject.SetActive(false);
+        _UiHighCrosshair.SetActive(true);
+    }
+
+    public void OnShootHigh()
     {
         //guard clauses
-        if (weapon == null)
+        if (Weapon == null)
         {
             Debug.Log("no weapon equipped. will not fire");
             return;
         }
-        if (weapon.IsReloading) return;
+        if (Weapon.IsReloading) return;
+        
         //after this, go!
 
-        weapon.Fire(this, 10f, _highShootPoint.position);
-        Debug.Log("fired weapon high: " + weapon.WeaponName + ". " + "Ammo left: " + weapon.CurrMag);
+        Weapon.Fire(this, 10f, _highShootPoint.position);
+        Debug.Log("fired weapon high: " + Weapon.WeaponName + ". " + "Ammo left: " + Weapon.CurrMag);
     }
-    public void OnShootLow(InputValue val)
+    public void OnShootLow()
     {
-        if (weapon == null)
+        if (Weapon == null)
         {
             Debug.Log("no weapon equipped. will not fire");
             return;
         }
-        if (weapon.IsReloading) return;
+
+        if (Weapon.IsReloading) return;
 
 
-        weapon.Fire(this, 5f, _lowShootPoint.position);
-        Debug.Log("fired weapon low: " + weapon.WeaponName + ". " + "Ammo left: " + weapon.CurrMag);
+        Weapon.Fire(this, 5f, _lowShootPoint.position);
+        Debug.Log("fired weapon low: " + Weapon.WeaponName + ". " + "Ammo left: " + Weapon.CurrMag);
+    }
+
+    public void PickUpWeapon(WeaponData weaponToPickup)
+    {
+        if (Weapon == null)
+        {
+            Weapon = new Weapon(weaponToPickup);
+            return;
+        }
+        if (weaponToPickup.WeaponName == Weapon.WeaponName)
+        {
+            //TODO: give player ammo instead of weapon
+
+            return;
+        }
+        Weapon = new Weapon(weaponToPickup);
     }
 }
