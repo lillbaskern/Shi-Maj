@@ -29,8 +29,12 @@ public class PlayerMove : MonoBehaviour
 
     void Awake() => _cc = GetComponent<CharacterController>();
 
-    protected void MoveAndTurnLoop()
+    protected void MoveAndTurnLoop(InputAction turn, InputAction move)
     {
+        _turnDir = turn.ReadValue<Vector2>();
+        
+        _inputDir = move.ReadValue<Vector2>();
+
         //Set isgrounded
         IsGrounded = _cc.isGrounded;
         if (IsGrounded) _verticalVel = 0;
@@ -43,13 +47,5 @@ public class PlayerMove : MonoBehaviour
         
         _cc.transform.Rotate(Vector3.up * _turnDir.x * (Time.deltaTime * 100));
         _cc.Move(_cc.transform.rotation * _moveDir * Time.deltaTime);
-    }
-
-    public void OnMove(InputValue val) => _inputDir = val.Get<Vector2>();
-
-    public void OnTurn(InputValue val)
-    {
-        _turnDir = val.Get<Vector2>();
-        //TODO: make turn acceleration as it is in doom 93 (holding down run makes you turn faster, accelerates harshly)
     }
 }

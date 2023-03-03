@@ -5,6 +5,8 @@ using UnityEngine.InputSystem;
 
 public class InputHandler : MonoBehaviour
 {
+    //this is a one player game, so this is ok
+    public static InputHandler Instance { get; private set; }
 
     //movement
     private InputAction _move;
@@ -63,7 +65,6 @@ public class InputHandler : MonoBehaviour
     }
 
 
-
     private Controls _controls;
     public Controls Controls
     {
@@ -79,8 +80,24 @@ public class InputHandler : MonoBehaviour
         }
     }
 
-    private void SetInputActions()
+    private void Start()
     {
+        //singleton declaration
+        if (Instance != null)
+        {
+            Destroy(this);
+        }
+        else
+        {
+            Instance = this;
+        }
+        Controls = new();
+
+    }
+
+    public void SetInputActions()
+    {
+        Debug.Log("setinputactions called");
         _move = _controls.Player.Move;
         _move.Enable();
 

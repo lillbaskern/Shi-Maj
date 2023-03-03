@@ -10,5 +10,5 @@ public class WeaponData : ScriptableObject
     public int BulletsPerMag;
     public int MaxBulletCapacity;
     public float Range;
-
+    public float FireRate;
 }

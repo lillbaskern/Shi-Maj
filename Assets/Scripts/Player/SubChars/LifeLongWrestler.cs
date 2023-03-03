@@ -2,24 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-public class LifeLongWrestler : PlayerMove, IPlayerCharacter
+public class LifeLongWrestler : PlayerMove
 {
-
+    InputHandler _input;
     void Start()
     {
-
+        _input = gameObject.AddComponent<InputHandler>();
     }
 
     void Update()
     {
-        MoveAndTurnLoop();
-    }
-    public void OnSpecial(InputValue val)
-    {
-        
-    }
-    public void OnShoot(InputValue val)
-    {
-
+        MoveAndTurnLoop(_input.Turn,_input.Move);
     }
 }

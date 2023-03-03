@@ -3,21 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-
 public class Weapon
 {
     public Weapon(WeaponData input)
     {
-        //TODO: MAKE THIS CONSTRUCTOR DO THINGS BASED ON A SCRIPTABLEOBJECT PROVIDED AS PARAMETER
         IsReloading = false;
 
         WeaponName = input.WeaponName;
         Damage = input.Damage;
         MagCapacity = input.BulletsPerMag;
         AmmoCapacity = input.MaxBulletCapacity;
-        _reloadTime = new WaitForSeconds(input.ReloadTime);
+        _reloadTime = new(input.ReloadTime);
         CurrMag = MagCapacity;
         Range = input.Range;
+        _fireRate = new(input.FireRate);
     }
 
     public bool IsReloading { get; protected set; }
@@ -34,11 +33,12 @@ public class Weapon
     public int AmmoCapacity { get; private set; }
     public float Range { get; private set; }
     private WaitForSeconds _reloadTime { get; set; }
+    private WaitForSeconds _fireRate;
 
 
     public virtual IEnumerator Reload()
     {
-        if (CurrMag == MagCapacity || IsReloading) yield return null;
+        if (CurrMag == MagCapacity || IsReloading) yield break;
 
         Debug.Log("Reloading");
         IsReloading = true;
@@ -47,16 +47,14 @@ public class Weapon
 
         CurrMag = MagCapacity;
         IsReloading = false;
-
-        yield return null;
         Debug.Log("DONE reloading");
     }
-    //how the fuck would you 
-    public virtual void Fire(PlayerShoot player, float radius, Vector3 shootPoint)
+    //Base fire method for any type of weapon which attacks once per input (doesnt even have to be just a gun)
+    public virtual void Fire(Transform player, float radius, Vector3 shootPoint)
     {
         CurrMag -= 1;
         RaycastHit hit;
-        if (Physics.Raycast(shootPoint, player.transform.TransformDirection(Vector3.forward), out hit, Range))
+        if (Physics.Raycast(shootPoint, player.TransformDirection(Vector3.forward), out hit, Range))
         {
             if (hit.transform.TryGetComponent<EnemyHead>(out EnemyHead enemy))
             {
@@ -83,7 +81,7 @@ public class Weapon
 
 public class PlayerShoot : MonoBehaviour
 {
-    InputHandler inputHandler;
+    InputHandler _input;
     Transform _highCrosshair;
     [SerializeField] GameObject _UiHighCrosshair;
     public Weapon Weapon { get; private set; }
@@ -92,13 +90,17 @@ public class PlayerShoot : MonoBehaviour
     [SerializeField] Transform _lowShootPoint;
     [SerializeField] Transform _highShootPoint;
 
+    bool hasInit = false;
 
-    void Start()
+
+    IEnumerator Start()
     {
+        yield return new WaitForEndOfFrame();
+        _input = FindObjectOfType<InputHandler>();
         _lowShootPoint = GameObject.Find("LowShootOrigin").transform;
         _highShootPoint = GameObject.Find("HighShootOrigin").transform;
         _highCrosshair = GameObject.Find("HighCrosshairDecal").transform;
-        
+
         if (_highShootPoint == null || _lowShootPoint == null)
         {
             Debug.LogWarning("NOT ENOUGH SHOOTPOINTS ATTACHED, PLEASE ENSURE THAT YOU HAVE INHABITED LOWSHOOTPOINT AND HIGHSHOOTPOINT WITH ANY TRANSFORM(S)");
@@ -107,26 +109,28 @@ public class PlayerShoot : MonoBehaviour
         }
 
         _UiHighCrosshair = GameObject.Find("HIGHcrosshair");
+        hasInit = true;
     }
 
     void Update()
     {
-        
+        if(!hasInit) return;
         //draw ray for debug purposes
         Debug.DrawRay(_lowShootPoint.position, _lowShootPoint.TransformDirection(Vector3.forward) * 100f, Color.blue);
         Debug.DrawRay(_highShootPoint.position, _highShootPoint.TransformDirection(Vector3.forward) * 100f, Color.green);
 
         ProjectHighCrossHair();
+        PollForInput();
 
-        //handle weapon related things after this guard clause
+        //handle things that are weapon-related after this guard clause
         if (Weapon == null) return;
-        if (Weapon.CurrMag <= 0 && !Weapon.IsReloading) StartCoroutine(Weapon.Reload());
+        if (Weapon.CurrMag <= 0) StartCoroutine(Weapon.Reload());
     }
 
 
-    private void ProjectHighCrossHair()
+    protected virtual void ProjectHighCrossHair()
     {
-        //if (_highCrosshair == null) return;
+        if (_highCrosshair == null) return;
 
         RaycastHit hit;
         //to make the raycast work even if you are unarmed, we use a ternary operator to set a new floats value based on whether or not you have a weapon
@@ -151,35 +155,20 @@ public class PlayerShoot : MonoBehaviour
         _UiHighCrosshair.SetActive(true);
     }
 
-    public void OnShootHigh()
+    protected virtual void PollForInput()
     {
-        //guard clauses
-        if (Weapon == null)
+        if (_input.ShootHigh.WasPressedThisFrame())
         {
-            Debug.Log("no weapon equipped. will not fire");
+            Weapon.Fire(this.transform, 10f, _highShootPoint.position);
+            //im hoping this return only keeps the player from shooting both high and low on the same frame
             return;
         }
-        if (Weapon.IsReloading) return;
-        
-        //after this, go!
-
-        Weapon.Fire(this, 10f, _highShootPoint.position);
-        Debug.Log("fired weapon high: " + Weapon.WeaponName + ". " + "Ammo left: " + Weapon.CurrMag);
-    }
-    public void OnShootLow()
-    {
-        if (Weapon == null)
+        if (_input.ShootLow.WasPressedThisFrame())
         {
-            Debug.Log("no weapon equipped. will not fire");
-            return;
+            Weapon.Fire(this.transform, 10f, _lowShootPoint.position);
         }
-
-        if (Weapon.IsReloading) return;
-
-
-        Weapon.Fire(this, 5f, _lowShootPoint.position);
-        Debug.Log("fired weapon low: " + Weapon.WeaponName + ". " + "Ammo left: " + Weapon.CurrMag);
     }
+
 
     public void PickUpWeapon(WeaponData weaponToPickup)
     {
