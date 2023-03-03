@@ -18,3 +18,5 @@ MonoBehaviour:
   BulletsPerMag: 7
   MaxBulletCapacity: 28
   Range: 50
+  FireRate: 0.2
+  AmmoStock: 30

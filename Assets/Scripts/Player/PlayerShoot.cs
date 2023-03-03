@@ -3,6 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+public class Pistol : Weapon
+{
+    public Pistol(WeaponData input) : base(input)
+    {
+    }
+}
 public class Weapon
 {
     public Weapon(WeaponData input)
@@ -17,17 +23,19 @@ public class Weapon
         CurrMag = MagCapacity;
         Range = input.Range;
         _fireRate = new(input.FireRate);
+        AmmoStock = input.AmmoStock;
     }
-
     public bool IsReloading { get; protected set; }
     public string WeaponName { get; private set; }
-    public int Damage { get; private set; }
+    public int Damage { get; protected set; }
 
     //how many bullets are in your current mag
-    public int CurrMag;
+    public int CurrMag { get; protected set; }
 
     //how many shots you can fire before needing to reload
-    public int MagCapacity { get; private set; }
+    public int MagCapacity { get; protected set; }
+
+    public int AmmoStock { get; protected set; }
 
     //how many shots you can carry outside of the bullets in each mag
     public int AmmoCapacity { get; private set; }
@@ -38,20 +46,26 @@ public class Weapon
 
     public virtual IEnumerator Reload()
     {
-        if (CurrMag == MagCapacity || IsReloading) yield break;
+        //first clause would never happen since this coroutine is only called when currmag != magcapacity,
+        //but if i add a reload button in the future itll be useful
+        if (CurrMag == MagCapacity || IsReloading || AmmoStock <= 0) yield break;
 
         Debug.Log("Reloading");
         IsReloading = true;
 
-        yield return _reloadTime;
+        //replenish ammo based on how much ammo we have left
+        CurrMag = AmmoStock >= MagCapacity ? MagCapacity : AmmoStock;
+        //remove how much we reloaded from our stock of ammo
+        AmmoStock -= CurrMag;
 
-        CurrMag = MagCapacity;
+        yield return _reloadTime;
         IsReloading = false;
-        Debug.Log("DONE reloading");
+        Debug.Log("DONE reloading. Current ammostock is: " + AmmoStock);
     }
     //Base fire method for any type of weapon which attacks once per input (doesnt even have to be just a gun)
     public virtual void Fire(Transform player, float radius, Vector3 shootPoint)
     {
+        if(CurrMag == 0 || IsReloading) return;
         CurrMag -= 1;
         RaycastHit hit;
         if (Physics.Raycast(shootPoint, player.TransformDirection(Vector3.forward), out hit, Range))
@@ -59,7 +73,7 @@ public class Weapon
             if (hit.transform.TryGetComponent<EnemyHead>(out EnemyHead enemy))
             {
                 //Whenever it says "HP = damage" or something of the like, where HP and damage are both ints, it means that the HP will subtract damage from itself
-                //this is because HP is a property and its setter runs a method named takedamage which simply subtracts damage from a private hp variable
+                //this is because HP is a property and its setter runs a method named takedamage which simply subtracts the int damage from a private hp variable
                 enemy.HP = Damage;
                 return;
             }
@@ -75,6 +89,7 @@ public class Weapon
                 if (hitCollider[i].TryGetComponent<EnemyHead>(out EnemyHead head)) head.HP = Damage;
             }
         }
+        Debug.Log("fired weapon: " + WeaponName + ". Ammo left in mag: " + CurrMag);
 
     }
 }
@@ -114,7 +129,7 @@ public class PlayerShoot : MonoBehaviour
 
     void Update()
     {
-        if(!hasInit) return;
+        if (!hasInit) return;
         //draw ray for debug purposes
         Debug.DrawRay(_lowShootPoint.position, _lowShootPoint.TransformDirection(Vector3.forward) * 100f, Color.blue);
         Debug.DrawRay(_highShootPoint.position, _highShootPoint.TransformDirection(Vector3.forward) * 100f, Color.green);
@@ -133,7 +148,7 @@ public class PlayerShoot : MonoBehaviour
         if (_highCrosshair == null) return;
 
         RaycastHit hit;
-        //to make the raycast work even if you are unarmed, we use a ternary operator to set a new floats value based on whether or not you have a weapon
+        //to make the raycast work even if you are unarmed, we use the ternary operator to set a new floats value based on whether or not you have a weapon
         float range = Weapon == null ? 30f : Weapon.Range;
         if (Physics.Raycast(_highShootPoint.position, transform.TransformDirection(Vector3.forward), out hit, range))
         {
@@ -157,24 +172,25 @@ public class PlayerShoot : MonoBehaviour
 
     protected virtual void PollForInput()
     {
+
         if (_input.ShootHigh.WasPressedThisFrame())
         {
-            Weapon.Fire(this.transform, 10f, _highShootPoint.position);
+            Weapon?.Fire(this.transform, 10f, _highShootPoint.position);
             //im hoping this return only keeps the player from shooting both high and low on the same frame
             return;
         }
         if (_input.ShootLow.WasPressedThisFrame())
         {
-            Weapon.Fire(this.transform, 10f, _lowShootPoint.position);
+            Weapon?.Fire(this.transform, 10f, _lowShootPoint.position);
         }
     }
 
 
-    public void PickUpWeapon(WeaponData weaponToPickup)
+    public void PickUpWeapon(Weapon weaponToPickup)
     {
         if (Weapon == null)
         {
-            Weapon = new Weapon(weaponToPickup);
+            Weapon = weaponToPickup;
             return;
         }
         if (weaponToPickup.WeaponName == Weapon.WeaponName)
@@ -183,6 +199,7 @@ public class PlayerShoot : MonoBehaviour
 
             return;
         }
-        Weapon = new Weapon(weaponToPickup);
+        //todo: add support for multiple weapons at a time
+
     }
 }

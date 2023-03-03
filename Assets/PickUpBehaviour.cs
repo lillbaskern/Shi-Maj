@@ -5,11 +5,16 @@ using UnityEngine;
 public class PickUpBehaviour : MonoBehaviour
 {
     public WeaponData Weapon;
+    Pistol _weaponToPickUp;
+    private void Awake()
+    {
+        _weaponToPickUp = new Pistol(Weapon);
+    }
     private void OnTriggerEnter(Collider other)
     {
-        if(Weapon == null) Destroy(this.gameObject);
+        if (Weapon == null) Destroy(this.gameObject);
         Debug.Log("calling pickupweapon using weapondata: " + Weapon.WeaponName);
-        if(other.TryGetComponent<PlayerShoot>(out PlayerShoot shoot)) shoot.PickUpWeapon(Weapon);
+        if (other.TryGetComponent<PlayerShoot>(out PlayerShoot shoot)) shoot.PickUpWeapon(_weaponToPickUp);
         Destroy(this.gameObject);
     }
 }
