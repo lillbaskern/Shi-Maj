@@ -7,6 +7,7 @@ public interface ICharacter
 {
     public void CharacterLoop(InputHandler input);
     public void CharacterInit();
+    public void PickUpWeapon(Weapon weaponToPickup);
 
 }
 
@@ -22,10 +23,21 @@ public class LifeLongWrestler : PlayerMove, ICharacter
         //playermove uses awake so we dont need to rewrite its init to a seperate method to be called here, but shoot needs it though.
         base.InitShoot();
     }
-    
+
     public void CharacterLoop(InputHandler input)
     {
         MoveAndTurnLoop(input.Turn, input.Move);
         ShootUpdate();
+    }
+
+    public void PickUpWeapon(Weapon weaponToPickup)
+    {
+        if (weaponToPickup == base.Weapon)
+        {
+            //weapons have a special setter for ammostock which makes sure they stay within the limits of their max ammo capacity
+            base.Weapon.AmmoStock = weaponToPickup.AmmoStock;
+            return;
+        }
+        base.Weapon = weaponToPickup;
     }
 }

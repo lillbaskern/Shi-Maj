@@ -14,9 +14,9 @@ public class PlayerHead : MonoBehaviour
     PlayerShoot _shooter;
     public static List<ICharacter> Characters = new();
     ICharacter _currChar;
+    private int _currCharIndex = 0;
     [SerializeField] private int hp;
     private bool hasInit;
-    private int _currCharIndex = 0;
     public int HP
     {
         get
@@ -76,5 +76,10 @@ public class PlayerHead : MonoBehaviour
     {
         hp -= incomingDamage;
         Debug.Log(hp);
+    }
+    //TODO: FIX THIS DAISY-CHAIN OF PICKUPWEAPON METHODS
+    public void PickUpWeapon(Weapon weaponToPickup)
+    {
+        _currChar.PickUpWeapon((weaponToPickup));
     }
 }

@@ -14,7 +14,7 @@ public class PickUpBehaviour : MonoBehaviour
     {
         if (Weapon == null) Destroy(this.gameObject);
         Debug.Log("calling pickupweapon using weapondata: " + Weapon.WeaponName);
-        if (other.TryGetComponent<PlayerShoot>(out PlayerShoot shoot)) shoot.PickUpWeapon(_weaponToPickUp);
+        if (other.TryGetComponent<PlayerHead>(out PlayerHead head)) head.PickUpWeapon(_weaponToPickUp);
         Destroy(this.gameObject);
     }
 }

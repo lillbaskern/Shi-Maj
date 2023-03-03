@@ -35,8 +35,19 @@ public class Weapon
 
     //how many shots you can fire before needing to reload
     public int MagCapacity { get; protected set; }
-
-    public int AmmoStock { get; protected set; }
+    private int _ammoStock;
+    public int AmmoStock
+    {
+        get
+        {
+            return _ammoStock;
+        }
+        set
+        {
+            if(value + _ammoStock > AmmoCapacity) _ammoStock = AmmoCapacity;
+            else _ammoStock = _ammoStock + value;
+        }
+    }
 
     //how many shots you can carry outside of the bullets in each mag
     public int AmmoCapacity { get; private set; }
@@ -57,7 +68,7 @@ public class Weapon
         //replenish ammo based on how much ammo we have left
         CurrMag = AmmoStock >= MagCapacity ? MagCapacity : AmmoStock;
         //remove how much we reloaded from our stock of ammo
-        AmmoStock -= CurrMag;
+        AmmoStock = -CurrMag;
 
         yield return _reloadTime;
         IsReloading = false;
@@ -67,7 +78,7 @@ public class Weapon
     public virtual void Fire(Transform player, float radius, Vector3 shootPoint)
     {
         if (CurrMag == 0 || IsReloading) return;
-        CurrMag -= 1;
+        CurrMag -=1;
         RaycastHit hit;
         if (Physics.Raycast(shootPoint, player.TransformDirection(Vector3.forward), out hit, Range))
         {
@@ -100,7 +111,7 @@ public class PlayerShoot : MonoBehaviour
     protected InputHandler _input;
     static Transform _highCrosshair;
     [SerializeField] static GameObject _UiHighCrosshair;
-    public Weapon Weapon { get; private set; }
+    public Weapon Weapon { get; protected set; }
 
     //these transforms are from where raycasts will fire
     [SerializeField] static Transform _lowShootPoint;
@@ -109,9 +120,10 @@ public class PlayerShoot : MonoBehaviour
     bool hasInit = false;
 
 
+
     public void InitShoot()
     {
-        _input = gameObject.AddComponent<InputHandler>();
+        _input = GetComponent<InputHandler>();
         _lowShootPoint = GameObject.Find("LowShootOrigin").transform;
         _highShootPoint = GameObject.Find("HighShootOrigin").transform;
         _highCrosshair = GameObject.Find("HighCrosshairDecal").transform;
@@ -124,16 +136,15 @@ public class PlayerShoot : MonoBehaviour
         }
 
         _UiHighCrosshair = GameObject.Find("HIGHcrosshair");
-        hasInit = true;
+        this.hasInit = true;
     }
 
     protected void ShootUpdate()
     {
-        if (!hasInit) return;
+        if (!this.hasInit) return;
         //draw ray for debug purposes
         Debug.DrawRay(_lowShootPoint.position, _lowShootPoint.TransformDirection(Vector3.forward) * 100f, Color.blue);
         Debug.DrawRay(_highShootPoint.position, _highShootPoint.TransformDirection(Vector3.forward) * 100f, Color.green);
-
         ProjectHighCrossHair();
         PollForInput();
 
@@ -174,6 +185,7 @@ public class PlayerShoot : MonoBehaviour
 
         if (_input.ShootHigh.WasPressedThisFrame())
         {
+            Debug.Log(Weapon);
             Weapon?.Fire(this.transform, 10f, _highShootPoint.position);
             //im hoping this return only keeps the player from shooting both high and low on the same frame
             return;
@@ -184,21 +196,4 @@ public class PlayerShoot : MonoBehaviour
         }
     }
 
-
-    public void PickUpWeapon(Weapon weaponToPickup)
-    {
-        if (Weapon == null)
-        {
-            Weapon = weaponToPickup;
-            return;
-        }
-        if (weaponToPickup.WeaponName == Weapon.WeaponName)
-        {
-            //TODO: give player ammo instead of weapon
-
-            return;
-        }
-        //todo: add support for multiple weapons at a time
-
-    }
 }
