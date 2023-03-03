@@ -25,6 +25,7 @@ public class Weapon
         _fireRate = new(input.FireRate);
         AmmoStock = input.AmmoStock;
     }
+
     public bool IsReloading { get; protected set; }
     public string WeaponName { get; private set; }
     public int Damage { get; protected set; }
@@ -60,12 +61,12 @@ public class Weapon
 
         yield return _reloadTime;
         IsReloading = false;
-        Debug.Log("DONE reloading. Current ammostock is: " + AmmoStock);
+        Debug.Log("DONE reloading. Current ammo stock is: " + AmmoStock);
     }
     //Base fire method for any type of weapon which attacks once per input (doesnt even have to be just a gun)
     public virtual void Fire(Transform player, float radius, Vector3 shootPoint)
     {
-        if(CurrMag == 0 || IsReloading) return;
+        if (CurrMag == 0 || IsReloading) return;
         CurrMag -= 1;
         RaycastHit hit;
         if (Physics.Raycast(shootPoint, player.TransformDirection(Vector3.forward), out hit, Range))
@@ -96,22 +97,21 @@ public class Weapon
 
 public class PlayerShoot : MonoBehaviour
 {
-    InputHandler _input;
-    Transform _highCrosshair;
-    [SerializeField] GameObject _UiHighCrosshair;
+    protected InputHandler _input;
+    static Transform _highCrosshair;
+    [SerializeField] static GameObject _UiHighCrosshair;
     public Weapon Weapon { get; private set; }
 
     //these transforms are from where raycasts will fire
-    [SerializeField] Transform _lowShootPoint;
-    [SerializeField] Transform _highShootPoint;
+    [SerializeField] static Transform _lowShootPoint;
+    [SerializeField] static Transform _highShootPoint;
 
     bool hasInit = false;
 
 
-    IEnumerator Start()
+    public void InitShoot()
     {
-        yield return new WaitForEndOfFrame();
-        _input = FindObjectOfType<InputHandler>();
+        _input = gameObject.AddComponent<InputHandler>();
         _lowShootPoint = GameObject.Find("LowShootOrigin").transform;
         _highShootPoint = GameObject.Find("HighShootOrigin").transform;
         _highCrosshair = GameObject.Find("HighCrosshairDecal").transform;
@@ -127,7 +127,7 @@ public class PlayerShoot : MonoBehaviour
         hasInit = true;
     }
 
-    void Update()
+    protected void ShootUpdate()
     {
         if (!hasInit) return;
         //draw ray for debug purposes
@@ -145,8 +145,7 @@ public class PlayerShoot : MonoBehaviour
 
     protected virtual void ProjectHighCrossHair()
     {
-        if (_highCrosshair == null) return;
-
+        //if (_highCrosshair == null) return;
         RaycastHit hit;
         //to make the raycast work even if you are unarmed, we use the ternary operator to set a new floats value based on whether or not you have a weapon
         float range = Weapon == null ? 30f : Weapon.Range;

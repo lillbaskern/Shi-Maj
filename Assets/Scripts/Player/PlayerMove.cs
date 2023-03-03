@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 //<SUMMARY>
 //CLASS WHICH HANDLES PLAYER MOVEMENT
 //IS INHERITED BY ANY CHARACTER
-public class PlayerMove : MonoBehaviour
+public class PlayerMove : PlayerShoot
 {
     Camera _cam;
     //keeping this public for now. i doubt any gameplay method would even get close to changing this variable anyways
@@ -29,22 +29,28 @@ public class PlayerMove : MonoBehaviour
 
     void Awake() => _cc = GetComponent<CharacterController>();
 
+    protected void SendToCharList(ICharacter character)
+    {
+        if(PlayerHead.Characters.Contains(character)) return;
+        PlayerHead.Characters.Add(character);
+    }
+
     protected void MoveAndTurnLoop(InputAction turn, InputAction move)
     {
         _turnDir = turn.ReadValue<Vector2>();
-        
+
         _inputDir = move.ReadValue<Vector2>();
 
         //Set isgrounded
         IsGrounded = _cc.isGrounded;
         if (IsGrounded) _verticalVel = 0;
-        
+
         Vector3 _moveDir = new Vector3(_inputDir.x * _moveSpeed, _verticalVel, _inputDir.y * _moveSpeed);
-        
+
         //gravity
         _verticalVel = Mathf.MoveTowards(_verticalVel, Physics.gravity.y, _fallSpeed);
 
-        
+
         _cc.transform.Rotate(Vector3.up * _turnDir.x * (Time.deltaTime * 100));
         _cc.Move(_cc.transform.rotation * _moveDir * Time.deltaTime);
     }

@@ -80,6 +80,24 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""NextChar"",
+                    ""type"": ""Button"",
+                    ""id"": ""b7790158-64da-44ea-abbc-aeb7ab76d1ed"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PrevChar"",
+                    ""type"": ""Button"",
+                    ""id"": ""e7d97a3e-6322-4396-be21-960990a2c2f9"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -247,6 +265,28 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""action"": ""Special"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""ae2afe1e-32fa-4e64-a2e4-ecb8a2ba1064"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""NextChar"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3e613741-8810-4f0f-ad1b-ce00da76ef13"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PrevChar"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -278,6 +318,8 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         m_Player_Move = m_Player.FindAction("Move", throwIfNotFound: true);
         m_Player_Turn = m_Player.FindAction("Turn", throwIfNotFound: true);
         m_Player_Special = m_Player.FindAction("Special", throwIfNotFound: true);
+        m_Player_NextChar = m_Player.FindAction("NextChar", throwIfNotFound: true);
+        m_Player_PrevChar = m_Player.FindAction("PrevChar", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -343,6 +385,8 @@ public partial class @Controls : IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_Move;
     private readonly InputAction m_Player_Turn;
     private readonly InputAction m_Player_Special;
+    private readonly InputAction m_Player_NextChar;
+    private readonly InputAction m_Player_PrevChar;
     public struct PlayerActions
     {
         private @Controls m_Wrapper;
@@ -353,6 +397,8 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         public InputAction @Move => m_Wrapper.m_Player_Move;
         public InputAction @Turn => m_Wrapper.m_Player_Turn;
         public InputAction @Special => m_Wrapper.m_Player_Special;
+        public InputAction @NextChar => m_Wrapper.m_Player_NextChar;
+        public InputAction @PrevChar => m_Wrapper.m_Player_PrevChar;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -380,6 +426,12 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 @Special.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSpecial;
                 @Special.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSpecial;
                 @Special.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnSpecial;
+                @NextChar.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnNextChar;
+                @NextChar.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnNextChar;
+                @NextChar.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnNextChar;
+                @PrevChar.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPrevChar;
+                @PrevChar.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPrevChar;
+                @PrevChar.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPrevChar;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -402,6 +454,12 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 @Special.started += instance.OnSpecial;
                 @Special.performed += instance.OnSpecial;
                 @Special.canceled += instance.OnSpecial;
+                @NextChar.started += instance.OnNextChar;
+                @NextChar.performed += instance.OnNextChar;
+                @NextChar.canceled += instance.OnNextChar;
+                @PrevChar.started += instance.OnPrevChar;
+                @PrevChar.performed += instance.OnPrevChar;
+                @PrevChar.canceled += instance.OnPrevChar;
             }
         }
     }
@@ -423,5 +481,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         void OnMove(InputAction.CallbackContext context);
         void OnTurn(InputAction.CallbackContext context);
         void OnSpecial(InputAction.CallbackContext context);
+        void OnNextChar(InputAction.CallbackContext context);
+        void OnPrevChar(InputAction.CallbackContext context);
     }
 }

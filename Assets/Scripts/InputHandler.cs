@@ -16,11 +16,16 @@ public class InputHandler : MonoBehaviour
     private InputAction _shootHigh;
     private InputAction _shootLow;
 
+    //character switching
+    private InputAction _nextChar;
+    private InputAction _prevChar;
+
     //misc
     private InputAction _special;
     private InputAction _interact;
 
 
+    //movement
     public InputAction Move
     {
         get
@@ -28,13 +33,15 @@ public class InputHandler : MonoBehaviour
             return _move;
         }
     }
-    public InputAction Interact
+    public InputAction Turn
     {
         get
         {
-            return _interact;
+            return _turn;
         }
     }
+
+    //weapon usage
     public InputAction ShootLow
     {
         get
@@ -49,6 +56,26 @@ public class InputHandler : MonoBehaviour
             return _shootHigh;
         }
     }
+
+    //character switching
+    public InputAction NextChar
+    {
+        get { return _nextChar; }
+    }
+    public InputAction PrevChar
+    {
+        get { return _prevChar; }
+    }
+
+    //misc
+    public InputAction Interact
+    {
+        get
+        {
+            return _interact;
+        }
+    }
+
     public InputAction Special
     {
         get
@@ -56,13 +83,7 @@ public class InputHandler : MonoBehaviour
             return _special;
         }
     }
-    public InputAction Turn
-    {
-        get
-        {
-            return _turn;
-        }
-    }
+
 
 
     private Controls _controls;
@@ -91,6 +112,7 @@ public class InputHandler : MonoBehaviour
         {
             Instance = this;
         }
+        //do this so setinputactions is called
         Controls = new();
 
     }
@@ -98,6 +120,12 @@ public class InputHandler : MonoBehaviour
     public void SetInputActions()
     {
         Debug.Log("setinputactions called");
+        _nextChar = _controls.Player.NextChar;
+        _nextChar.Enable();
+        
+        _prevChar = _controls.Player.PrevChar;
+        _prevChar.Enable();
+
         _move = _controls.Player.Move;
         _move.Enable();
 
@@ -119,6 +147,8 @@ public class InputHandler : MonoBehaviour
 
     private void OnDisable()
     {
+        _nextChar.Disable();
+        _prevChar.Disable();
         _move.Disable();
         _turn.Disable();
         _shootHigh.Disable();
