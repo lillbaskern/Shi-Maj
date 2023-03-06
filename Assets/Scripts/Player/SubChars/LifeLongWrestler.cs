@@ -8,11 +8,15 @@ public interface ICharacter
     public void CharacterLoop(InputHandler input);
     public void CharacterInit();
     public void PickUpWeapon(Weapon weaponToPickup);
+    public string Name();
 
 }
 
 public class LifeLongWrestler : PlayerMove, ICharacter
 {
+    [SerializeField] string _name = "Life Long Wrestler";
+    public string Name() => _name;
+
     private void OnEnable()
     {
         //the characters you have available are stored in a static list. they will add themselves to the list using sendtocharlist() from playermove
@@ -26,18 +30,7 @@ public class LifeLongWrestler : PlayerMove, ICharacter
 
     public void CharacterLoop(InputHandler input)
     {
-        MoveAndTurnLoop(input.Turn, input.Move);
+        MoveAndTurnLoop(input.Turn, input.Move, input.Special);
         ShootUpdate();
-    }
-
-    public void PickUpWeapon(Weapon weaponToPickup)
-    {
-        if (weaponToPickup == base.Weapon)
-        {
-            //weapons have a special setter for ammostock which makes sure they stay within the limits of their max ammo capacity
-            base.Weapon.AmmoStock = weaponToPickup.AmmoStock;
-            return;
-        }
-        base.Weapon = weaponToPickup;
     }
 }

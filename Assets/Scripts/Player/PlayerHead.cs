@@ -1,19 +1,32 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+
 ///////<SUMMARY>///////
 //PlayerHead contains important data about the players current state,
 //-so that other scripts can quickly make changes to the player's HP/other stats. 
+//for the sake of this assignment, it also handles characters and character switching
 public class PlayerHead : MonoBehaviour
 {
+    public static event EventHandler<CharChangeEventArgs> CharChanged;
+    public static event EventHandler<WeaponChangeEventArgs> WeaponChanged;
     //the viewmodel's camera's GameObject
     GameObject _uiCamera;
 
     InputHandler _input;
 
+    
     PlayerShoot _shooter;
+    
     public static List<ICharacter> Characters = new();
     ICharacter _currChar;
+    
+    public ICharacter CurrentCharacter
+    {
+        get { return _currChar; }
+    }
+    
     private int _currCharIndex = 0;
     [SerializeField] private int hp;
     private bool hasInit;
@@ -35,11 +48,17 @@ public class PlayerHead : MonoBehaviour
         //let character scripts do their thing
         yield return new WaitForEndOfFrame();
 
-        //cache input handler
         _currChar = Characters[_currCharIndex];
+        
+        //invoke event
+        CharChangeEventArgs args = new(_currChar.Name());
+        CharChanged?.Invoke(this, args);
+
         _uiCamera = GameObject.Find("UICamera");
+
         InitAllChars();
-        _input = (InputHandler)FindObjectOfType(typeof(InputHandler));
+
+        _input = GetComponent<InputHandler>();
         hasInit = true;
     }
     void InitAllChars()
@@ -53,23 +72,42 @@ public class PlayerHead : MonoBehaviour
     void Update()
     {
         if (!hasInit) return;
+
         if (_input.NextChar.WasPressedThisFrame())
         {
-            //TODO: MAKE CURRCHARINDEX STAY WITHIN THE LISTS RANGE
-            _currChar = Characters[++_currCharIndex];
-            Debug.Log("switched to "+ _currChar);
+            _currCharIndex++;
+            if (_currCharIndex > Characters.Count - 1)
+            {
+                _currCharIndex = Characters.Count - 1;
+                return;
+            }
+            _currChar = Characters[_currCharIndex];
+            
+            //invoke event
+            CharChangeEventArgs args = new(_currChar.Name());
+            CharChanged?.Invoke(this, args);
+
+            Debug.Log("switched to " + _currChar);
         }
+
         if (_input.PrevChar.WasPressedThisFrame())
         {
-            _currChar = Characters[--_currCharIndex];
-            Debug.Log("switched to "+ _currChar);
+            _currCharIndex--;
+            if (_currCharIndex < 0)
+            {
+                _currCharIndex = 0;
+                return;
+            }
+            _currChar = Characters[_currCharIndex];
+
+            //invoke event
+            CharChangeEventArgs args = new(_currChar.Name());
+            CharChanged?.Invoke(this, args);
+
+            Debug.Log("switched to " + _currChar);
         }
 
         _currChar.CharacterLoop(_input);
-    }
-    private void ManageViewmodel()
-    {
-
     }
 
     void TakeDamage(int incomingDamage)
@@ -77,9 +115,23 @@ public class PlayerHead : MonoBehaviour
         hp -= incomingDamage;
         Debug.Log(hp);
     }
-    //TODO: FIX THIS DAISY-CHAIN OF PICKUPWEAPON METHODS
-    public void PickUpWeapon(Weapon weaponToPickup)
+}
+//event arguments classes
+public class WeaponChangeEventArgs : EventArgs
+{
+    public WeaponChangeEventArgs(Weapon weapon)
     {
-        _currChar.PickUpWeapon((weaponToPickup));
+        WeaponSprite = weapon.WeaponSprite;
     }
+    public Sprite WeaponSprite;
+    //todo: make and package weapon equip animations 
+    public Animation weaponEquipAnim;
+}
+public class CharChangeEventArgs : EventArgs
+{
+    public CharChangeEventArgs(string charName)
+    {
+        CharacterName = charName;
+    }
+    public string CharacterName;
 }

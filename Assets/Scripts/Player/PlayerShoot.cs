@@ -24,7 +24,10 @@ public class Weapon
         Range = input.Range;
         _fireRate = new(input.FireRate);
         AmmoStock = input.AmmoStock;
+        WeaponSprite = input.WeaponSprite;
     }
+
+    public Sprite WeaponSprite { get; protected set; }
 
     public bool IsReloading { get; protected set; }
     public string WeaponName { get; private set; }
@@ -163,14 +166,13 @@ public class PlayerShoot : MonoBehaviour
         float range = Weapon == null ? 30f : Weapon.Range;
         if (Physics.Raycast(_highShootPoint.position, transform.TransformDirection(Vector3.forward), out hit, range))
         {
-            if (hit.distance < 4.57f)
+            if (hit.distance < 4.57f) //4.57f is how close the enemy is when the crosshair starts go off-screen
             {
                 //AS THE CONCEPT GOES, YOUR CHARACTER WILL THROW A GRENADE IF THE ENEMY IS TOO CLOSE FOR THE UPPER CROSSHAIR DECAL TO DISPLAY ON SCREEN
                 //HERE WE ONLY PROJECT THE CROSSHAIR THOUGH, SO ONLY AN INDICATOR THAT THE GRENADE THROW WILL HAPPEN IS NEEDED HERE
                 //MAYBE CHANGE THE CROSSHAIR TO RED?
                 //OTHERWISE, RED CHEVRONS WHICH POINT UPWARD (MAYBE WITH A GRENADE ICON AS WELL?)
             }
-
             _highCrosshair.position = hit.point;
             _highCrosshair.rotation = this.transform.rotation;
             _highCrosshair.gameObject.SetActive(true);
@@ -195,5 +197,14 @@ public class PlayerShoot : MonoBehaviour
             Weapon?.Fire(this.transform, 10f, _lowShootPoint.position);
         }
     }
-
+    public void PickUpWeapon(Weapon weaponToPickup)
+    {
+        if (weaponToPickup == Weapon)
+        {
+            //weapons have a special setter for ammostock which makes sure they stay within the limits of their max ammo capacity
+            Weapon.AmmoStock = weaponToPickup.AmmoStock;
+            return;
+        }
+        Weapon = weaponToPickup;
+    }
 }

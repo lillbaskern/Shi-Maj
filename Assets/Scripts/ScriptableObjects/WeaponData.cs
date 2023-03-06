@@ -14,5 +14,6 @@ public class WeaponData : ScriptableObject
     public int AmmoStock;
     //these arent really in use for now but theyre going to be a part of the game
     public AudioClip ShootSound;
+    public Sprite WeaponSprite;
 
 }
