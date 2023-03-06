@@ -108,6 +108,7 @@ public class Weapon
 
 public class PlayerShoot : MonoBehaviour
 {
+    
     protected InputHandler _input;
     static Transform _highCrosshair;
     [SerializeField] static GameObject _UiHighCrosshair;
@@ -185,7 +186,6 @@ public class PlayerShoot : MonoBehaviour
 
         if (_input.ShootHigh.WasPressedThisFrame())
         {
-            Debug.Log(Weapon);
             Weapon?.Fire(this.transform, 10f, _highShootPoint.position);
             //im hoping this return only keeps the player from shooting both high and low on the same frame
             return;

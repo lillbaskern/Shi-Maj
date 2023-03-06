@@ -15,15 +15,19 @@ public class PlayerMove : PlayerShoot
 
 
 
-    [SerializeField] protected float _jumpHeight = 1;
+    [SerializeField] protected float _jumpHeight = 100;
     [SerializeField] protected float _fallSpeed = 0.5f;
     [SerializeField] protected float _moveSpeed = 5f;
 
+    float _moveLerp = 0f;
 
     [SerializeField] Vector2 _inputDir;
     private Vector2 _turnDir;
+    [SerializeField, Tooltip("How fast the player accelerates"), Range(0.1f, 100f)] float _moveAccel = 10f;
 
+    Vector3 _moveDir;
     private float _verticalVel;
+
 
     public bool IsGrounded { get; private set; }
 
@@ -31,27 +35,34 @@ public class PlayerMove : PlayerShoot
 
     protected void SendToCharList(ICharacter character)
     {
-        if(PlayerHead.Characters.Contains(character)) return;
+        if (PlayerHead.Characters.Contains(character)) return;
         PlayerHead.Characters.Add(character);
     }
 
     protected void MoveAndTurnLoop(InputAction turn, InputAction move)
     {
+        //read input vectors
         _turnDir = turn.ReadValue<Vector2>();
-
         _inputDir = move.ReadValue<Vector2>();
 
         //Set isgrounded
         IsGrounded = _cc.isGrounded;
         if (IsGrounded) _verticalVel = 0;
 
-        Vector3 _moveDir = new Vector3(_inputDir.x * _moveSpeed, _verticalVel, _inputDir.y * _moveSpeed);
 
-        //gravity
+
+        //gravity, you can further dissolve gravity.y into float _MaxFallSpeed 
         _verticalVel = Mathf.MoveTowards(_verticalVel, Physics.gravity.y, _fallSpeed);
 
 
+
         _cc.transform.Rotate(Vector3.up * _turnDir.x * (Time.deltaTime * 100));
+
+        _moveDir = new Vector3(_inputDir.x * _moveSpeed, _verticalVel, _inputDir.y * _moveSpeed);
         _cc.Move(_cc.transform.rotation * _moveDir * Time.deltaTime);
+    }
+    protected void Jump()
+    {
+        _verticalVel = Mathf.Sqrt(_jumpHeight * 2f * Physics.gravity.y);
     }
 }

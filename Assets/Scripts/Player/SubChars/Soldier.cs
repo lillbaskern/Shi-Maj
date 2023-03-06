@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Soldier : PlayerMove, ICharacter
 {
+
+    static Weapon _currWeapon;
+
     private void OnEnable()
     {
         SendToCharList(this);
@@ -16,6 +19,10 @@ public class Soldier : PlayerMove, ICharacter
     {
         MoveAndTurnLoop(input.Turn, input.Move);
         ShootUpdate();
+        if (input.Special.WasPerformedThisFrame())
+        {
+            base.Jump();
+        }
     }
     public void PickUpWeapon(Weapon weaponToPickup)
     {
@@ -27,4 +34,5 @@ public class Soldier : PlayerMove, ICharacter
         }
         base.Weapon = weaponToPickup;
     }
+
 }
