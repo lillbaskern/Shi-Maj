@@ -14,7 +14,6 @@ public interface ICharacter
 
 public class LifeLongWrestler : PlayerMove, ICharacter
 {
-    [SerializeField] string _name = "Life Long Wrestler";
     public string Name() => _name;
 
     private void OnEnable()
@@ -34,3 +33,4 @@ public class LifeLongWrestler : PlayerMove, ICharacter
         ShootUpdate();
     }
 }
+
