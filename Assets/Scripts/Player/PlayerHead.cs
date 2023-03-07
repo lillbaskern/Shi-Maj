@@ -9,7 +9,7 @@ using System;
 //for the sake of this assignment, it also handles characters and character switching
 public class PlayerHead : MonoBehaviour
 {
-    public static event EventHandler<CharChangeEventArgs> CharChanged;
+    public static event EventHandler<UiTextChangeEventArgs> TextChanged;
     public static event EventHandler<WeaponChangeEventArgs> WeaponChanged;
     //the viewmodel's camera's GameObject
     GameObject _uiCamera;
@@ -51,8 +51,8 @@ public class PlayerHead : MonoBehaviour
         _currChar = Characters[_currCharIndex];
         
         //invoke event
-        CharChangeEventArgs args = new(_currChar.Name());
-        CharChanged?.Invoke(this, args);
+        UiTextChangeEventArgs args = new(_currChar.Name());
+        TextChanged?.Invoke(this, args);
 
         _uiCamera = GameObject.Find("UICamera");
 
@@ -84,8 +84,8 @@ public class PlayerHead : MonoBehaviour
             _currChar = Characters[_currCharIndex];
             
             //invoke event
-            CharChangeEventArgs args = new(_currChar.Name());
-            CharChanged?.Invoke(this, args);
+            UiTextChangeEventArgs args = new(_currChar.Name());
+            TextChanged?.Invoke(this, args);
 
             Debug.Log("switched to " + _currChar);
         }
@@ -101,8 +101,8 @@ public class PlayerHead : MonoBehaviour
             _currChar = Characters[_currCharIndex];
 
             //invoke event
-            CharChangeEventArgs args = new(_currChar.Name());
-            CharChanged?.Invoke(this, args);
+            UiTextChangeEventArgs args = new(_currChar.Name());
+            TextChanged?.Invoke(this, args);
 
             Debug.Log("switched to " + _currChar);
         }
@@ -116,7 +116,8 @@ public class PlayerHead : MonoBehaviour
         Debug.Log(hp);
     }
 }
-//event arguments classes
+
+//event argument classes
 public class WeaponChangeEventArgs : EventArgs
 {
     public WeaponChangeEventArgs(Weapon weapon)
@@ -124,14 +125,14 @@ public class WeaponChangeEventArgs : EventArgs
         WeaponSprite = weapon.WeaponSprite;
     }
     public Sprite WeaponSprite;
-    //todo: make and package weapon equip animations 
+    //todo: make and package weapon equip animations (inside scriptable object)
     public Animation weaponEquipAnim;
 }
-public class CharChangeEventArgs : EventArgs
+public class UiTextChangeEventArgs : EventArgs
 {
-    public CharChangeEventArgs(string charName)
+    public UiTextChangeEventArgs(string input)
     {
-        CharacterName = charName;
+        text = input;
     }
-    public string CharacterName;
+    public string text;
 }
