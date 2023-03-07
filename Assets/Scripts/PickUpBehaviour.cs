@@ -5,8 +5,9 @@ using UnityEngine;
 public class PickUpBehaviour : MonoBehaviour
 {
     public WeaponData Weapon;
-    Pistol _weaponToPickUp;
-    private void Awake() => _weaponToPickUp = new Pistol(Weapon);
+    public Weapon weapon;
+    private void Awake() => weapon = new(Weapon);
+    
     private void OnTriggerEnter(Collider other)
     {
         if(!other.CompareTag("Player")) return;
@@ -14,7 +15,7 @@ public class PickUpBehaviour : MonoBehaviour
         if (Weapon == null) Destroy(this.gameObject);
         
         Debug.Log("calling pickupweapon using weapondata: " + Weapon.WeaponName);
-        if (other.TryGetComponent<PlayerHead>(out PlayerHead head)) head.CurrentCharacter.PickUpWeapon(_weaponToPickUp);
+        if (other.TryGetComponent<PlayerHead>(out PlayerHead head)) head.CurrentCharacter.PickUpWeapon(weapon);
         Destroy(this.gameObject);
     }
 }

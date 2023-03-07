@@ -92,6 +92,17 @@
                 },
                 {
                     "name": "",
+                    "id": "42a57393-dab5-4ca8-8e8c-68e94c9b4e37",
+                    "path": "<Touchscreen>/Press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "ShootHigh",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "1bc4d0b4-6e57-43a1-949c-68d118f6718f",
                     "path": "<Keyboard>/space",
                     "interactions": "",
@@ -179,6 +190,17 @@
                     "isPartOfComposite": true
                 },
                 {
+                    "name": "",
+                    "id": "7607ac6a-b651-4df0-8eca-e952a162a524",
+                    "path": "<Touchscreen>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Move",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
                     "name": "J och L",
                     "id": "263ac3ca-eabc-42b7-aa21-37778fe71090",
                     "path": "2DVector",
@@ -229,6 +251,61 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "Classic",
+                    "action": "Turn",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "Touch",
+                    "id": "3d668a84-3a2d-4437-9820-8ed8bae6940a",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Turn",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "dc234eae-fd5c-4f07-b3f2-20f545cc1a58",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Turn",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "8dec16af-38f7-4747-8a73-8b7881ee0884",
+                    "path": "",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Turn",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "left",
+                    "id": "d4d841fb-2b17-403b-a092-dd86d06c1e53",
+                    "path": "<Touchscreen>/touch1/delta/left",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Turn",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "right",
+                    "id": "24846895-8093-411e-a1e7-26ba76300cd1",
+                    "path": "<Touchscreen>/touch1/delta/right",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
                     "action": "Turn",
                     "isComposite": false,
                     "isPartOfComposite": true

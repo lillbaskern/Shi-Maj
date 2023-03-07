@@ -1,11 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class Soldier : PlayerMove, ICharacter
+public class GameDeveloper : PlayerMove, ICharacter
 {
     public string Name() => _name;
-
     private void OnEnable()
     {
         SendToCharList(this);
@@ -19,6 +14,4 @@ public class Soldier : PlayerMove, ICharacter
         MoveAndTurnLoop(input.Turn, input.Move, input.Special);
         ShootUpdate();
     }
-    
-
 }
