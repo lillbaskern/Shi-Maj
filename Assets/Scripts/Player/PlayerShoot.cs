@@ -113,7 +113,7 @@ public class PlayerShoot : MonoBehaviour
 {
     
     protected InputHandler _input;
-    static Transform _highCrosshair;
+    protected static Transform _highCrosshair;
     [SerializeField] static GameObject _UiHighCrosshair;
     public Weapon Weapon { get; protected set; }
 

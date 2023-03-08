@@ -6,6 +6,8 @@ using UnityEngine.InputSystem;
 //<SUMMARY>
 //CLASS WHICH HANDLES PLAYER MOVEMENT
 //IS INHERITED BY ANY CHARACTER
+//also contains certain character properties which just cant be put into an interface
+//namely string _name, 
 public class PlayerMove : PlayerShoot
 {
     [SerializeField] protected string _name;
@@ -14,23 +16,24 @@ public class PlayerMove : PlayerShoot
     public float LookSensitivity = 4;
     CharacterController _cc;
 
-    //where the top touch area begins (meant for movement) 
-    Vector2 _topTouchAreaBeginPoint;
-    //bottom touch area should be fine if its just left as everything that is not _topTouchArea...
-    Vector2 _topScreenArea;
-
     [SerializeField] protected float _jumpHeight = 100;
     [SerializeField] protected float _fallSpeed = 0.5f;
     [SerializeField] protected float _moveSpeed = 5f;
 
     float _moveLerp = 0f;
 
+
     [SerializeField] Vector2 _inputDir;
+
     private Vector2 _turnDir;
     [SerializeField, Tooltip("How fast the player accelerates"), Range(0.1f, 50f)] float _moveAccel = 10f;
 
     Vector3 _moveDir;
     private float _verticalVel;
+
+    public static Collider2D _topTouchArea;
+    public static Vector2 _topTouchAreaBeginPoint;
+    Collider _bottomTouchArea;
 
 
     public bool IsGrounded { get; private set; }
@@ -38,8 +41,11 @@ public class PlayerMove : PlayerShoot
     void Awake()
     {
         _cc = GetComponent<CharacterController>();
-        _topScreenArea.x = Screen.width * 0.5f;
-        _topScreenArea.y = Screen.height * 0.75f;
+        _topTouchArea = GameObject.Find("TopTouchBox").GetComponent<BoxCollider2D>();
+        _topTouchAreaBeginPoint.y = Screen.height * 0.75f;
+        _topTouchAreaBeginPoint.x = Screen.width * 0.5f;
+        _highCrosshair = GameObject.Find("HighCrosshairDecal").transform;
+        _highCrosshair.position = _topTouchAreaBeginPoint;
     }
 
     protected void SendToCharList(ICharacter character)
@@ -53,26 +59,35 @@ public class PlayerMove : PlayerShoot
         //read input vectors
         _turnDir = turn.ReadValue<Vector2>();
         _inputDir = move.ReadValue<Vector2>();
+        Debug.Log(_inputDir);
 
-        if(!move.inProgress) _inputDir = Vector2.zero;
+        if (!move.inProgress) _inputDir = Vector2.zero;
 
         //check which platform we're on and if its android handletouch
         if (Application.platform == RuntimePlatform.Android)
         {
-            HandleTouch(_inputDir);
+            HandleTouch(_inputDir, _topTouchArea);
         }
-        //for now we do this though
-        //HandleTouch(_inputDir);
+        //TODO: automate which inputs and colliders are sent to this function
+        //for debugging purposes we do this though
+        HandleTouch(_inputDir, _topTouchArea);
+
+
 
         //Set isgrounded
         IsGrounded = _cc.isGrounded;
         if (IsGrounded) _verticalVel = 0;
+
+
 
         //jumping and gravity (prototype only)
         if (Jump.WasPressedThisFrame() && IsGrounded)
         {
             _verticalVel += Mathf.Sqrt(_jumpHeight * -2f * Physics.gravity.y);
         }
+
+
+
         //you can further dissolve Physics.gravity.y into float _MaxFallSpeed 
         _verticalVel += Physics.gravity.y * Time.deltaTime;
         _verticalVel = Mathf.Clamp(_verticalVel, Physics.gravity.y, 50f);
@@ -85,19 +100,29 @@ public class PlayerMove : PlayerShoot
         _moveDir = new Vector3(_inputDir.x * _moveSpeed, _verticalVel, _inputDir.y * _moveSpeed);
         _cc.Move(_cc.transform.rotation * _moveDir * Time.deltaTime);
     }
-
-    void HandleTouch(Vector2 inputVector)
+    //method for handling touch input. makes sure that the player doesnt drift 
+    void HandleTouch(Vector2 inputVector, Collider2D touchArea)
     {
-        //cache dir for safety reasons
-        Vector2 cachedInputDir = inputVector;
+        //make sure touch is within its designated area
+        if (!touchArea.bounds.Contains(inputVector))
+        {
+            //setting _inputDir to zero here causes an abrupt stop to the player's movement
+            //thats okay tho, as acceleration/deacceleration will be handled seperate from _inputDir 
+            _inputDir = Vector2.zero;
+            return;
+        }
 
+
+        //TODO: FIND WAY TO DETERMINE WHETHER OR NOT THE PLAYER HAS STOPPED MOVING THEIR FINGER(S)
+        //MAYBE: just hold a buffer of like 10 frames and check how approximately close they are. if theyre too close just return a vector2.zero or more the input vector towards zero
+        //more thinking needed
         if (inputVector.normalized == Vector2.zero)
         {
             _inputDir = Vector2.zero;
             return;
         }
+        _inputDir = inputVector - _topTouchAreaBeginPoint;
 
-        _inputDir = inputVector - _topScreenArea;
         _inputDir = _inputDir.normalized;
     }
 }
