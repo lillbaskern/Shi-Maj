@@ -3,12 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class Pistol : Weapon
-{
-    public Pistol(WeaponData input) : base(input)
-    {
-    }
-}
 public class Weapon
 {
     public Weapon(WeaponData input)

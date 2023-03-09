@@ -114,8 +114,8 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""42a57393-dab5-4ca8-8e8c-68e94c9b4e37"",
-                    ""path"": ""<Touchscreen>/Press"",
+                    ""id"": ""7b8f9bfe-0f03-4c43-9774-4e652aa218fd"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -127,6 +127,17 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""name"": """",
                     ""id"": ""1bc4d0b4-6e57-43a1-949c-68d118f6718f"",
                     ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ShootLow"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""61553886-4918-4672-81fe-84eee2b77e74"",
+                    ""path"": ""<Gamepad>/leftShoulder"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -148,7 +159,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""d67cdc71-75a2-46e8-a956-1a9d6f64fd65"",
-                    ""path"": ""<Gamepad>/dpad"",
+                    ""path"": ""<Gamepad>/leftStick"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -212,17 +223,6 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": """",
-                    ""id"": ""7607ac6a-b651-4df0-8eca-e952a162a524"",
-                    ""path"": ""<Touchscreen>/position"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""Move"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
                     ""name"": ""J och L"",
                     ""id"": ""263ac3ca-eabc-42b7-aa21-37778fe71090"",
                     ""path"": ""2DVector"",
@@ -278,8 +278,8 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": true
                 },
                 {
-                    ""name"": ""Touch"",
-                    ""id"": ""3d668a84-3a2d-4437-9820-8ed8bae6940a"",
+                    ""name"": ""Gamepad/Touch"",
+                    ""id"": ""ae7df5f4-a816-4668-83ae-890fffc70d45"",
                     ""path"": ""2DVector"",
                     ""interactions"": """",
                     ""processors"": """",
@@ -290,7 +290,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": ""up"",
-                    ""id"": ""dc234eae-fd5c-4f07-b3f2-20f545cc1a58"",
+                    ""id"": ""57f4c2c5-f7c2-4677-864c-1fc6817346f9"",
                     ""path"": """",
                     ""interactions"": """",
                     ""processors"": """",
@@ -301,7 +301,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": ""down"",
-                    ""id"": ""8dec16af-38f7-4747-8a73-8b7881ee0884"",
+                    ""id"": ""48534715-0672-48de-bec3-976cd8df5eea"",
                     ""path"": """",
                     ""interactions"": """",
                     ""processors"": """",
@@ -312,8 +312,8 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": ""left"",
-                    ""id"": ""d4d841fb-2b17-403b-a092-dd86d06c1e53"",
-                    ""path"": ""<Touchscreen>/touch1/delta/left"",
+                    ""id"": ""5e457f12-084e-4ed8-be00-58fd8b14821a"",
+                    ""path"": ""<Gamepad>/rightStick/left"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -323,8 +323,8 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": ""right"",
-                    ""id"": ""24846895-8093-411e-a1e7-26ba76300cd1"",
-                    ""path"": ""<Touchscreen>/touch1/delta/right"",
+                    ""id"": ""b19b769d-9b2e-4ba3-a375-4b288502b810"",
+                    ""path"": ""<Gamepad>/rightStick/right"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
@@ -345,6 +345,17 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""53bdef97-94b4-4906-9b13-46002e80b2cf"",
+                    ""path"": ""<Gamepad>/buttonSouth"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Special"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""ae2afe1e-32fa-4e64-a2e4-ecb8a2ba1064"",
                     ""path"": ""<Keyboard>/e"",
                     ""interactions"": """",
@@ -356,8 +367,30 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
+                    ""id"": ""7a5cab13-5d22-4c58-ad8a-cd20ce1e8f42"",
+                    ""path"": ""<Gamepad>/buttonEast"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""NextChar"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
                     ""id"": ""3e613741-8810-4f0f-ad1b-ce00da76ef13"",
                     ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PrevChar"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""14c341b9-8962-4a92-8b88-b7bb6e8396e9"",
+                    ""path"": ""<Gamepad>/buttonNorth"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",

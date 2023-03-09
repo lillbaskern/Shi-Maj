@@ -20,13 +20,18 @@ public class PlayerMove : PlayerShoot
     [SerializeField] protected float _fallSpeed = 0.5f;
     [SerializeField] protected float _moveSpeed = 5f;
 
-    float _moveLerp = 0f;
+    [SerializeField, Range(0.1f, 15f)] float _maxSpeed = 5f;
+    [SerializeField, Range(0.1f, 1)] float _minSpeed = 5f;
+    [SerializeField, Tooltip("How fast the player accelerates"), Range(0.1f, 30f)] float _moveAccel = 10f;
 
+    float _turnRate;
+    [SerializeField] float _turnAccel;
+    [SerializeField] float _minTurnRate = 0.5f;
+    [SerializeField] float _maxTurnRate = 10f;
 
     [SerializeField] Vector2 _inputDir;
 
     private Vector2 _turnDir;
-    [SerializeField, Tooltip("How fast the player accelerates"), Range(0.1f, 50f)] float _moveAccel = 10f;
 
     Vector3 _moveDir;
     private float _verticalVel;
@@ -36,12 +41,12 @@ public class PlayerMove : PlayerShoot
     Collider _bottomTouchArea;
 
 
+
     public bool IsGrounded { get; private set; }
 
     void Awake()
     {
         _cc = GetComponent<CharacterController>();
-        _topTouchArea = GameObject.Find("TopTouchBox").GetComponent<BoxCollider2D>();
         _topTouchAreaBeginPoint.y = Screen.height * 0.75f;
         _topTouchAreaBeginPoint.x = Screen.width * 0.5f;
         _highCrosshair = GameObject.Find("HighCrosshairDecal").transform;
@@ -59,19 +64,8 @@ public class PlayerMove : PlayerShoot
         //read input vectors
         _turnDir = turn.ReadValue<Vector2>();
         _inputDir = move.ReadValue<Vector2>();
-        Debug.Log(_inputDir);
 
         if (!move.inProgress) _inputDir = Vector2.zero;
-
-        //check which platform we're on and if its android handletouch
-        if (Application.platform == RuntimePlatform.Android)
-        {
-            HandleTouch(_inputDir, _topTouchArea);
-        }
-        //TODO: automate which inputs and colliders are sent to this function
-        //for debugging purposes we do this though
-        HandleTouch(_inputDir, _topTouchArea);
-
 
 
         //Set isgrounded
@@ -85,29 +79,45 @@ public class PlayerMove : PlayerShoot
         {
             _verticalVel += Mathf.Sqrt(_jumpHeight * -2f * Physics.gravity.y);
         }
-
-
-
         //you can further dissolve Physics.gravity.y into float _MaxFallSpeed 
         _verticalVel += Physics.gravity.y * Time.deltaTime;
         _verticalVel = Mathf.Clamp(_verticalVel, Physics.gravity.y, 50f);
 
 
-        _cc.transform.Rotate(Vector3.up * _turnDir.x * (Time.deltaTime * 100));
+
+
+        //handle rotation
+        _cc.transform.Rotate(Vector3.up * _turnDir.x * (Time.deltaTime * _turnRate));
+
+        //handle move acceleration
+        if (_inputDir.magnitude <= 0)
+        {
+            _moveSpeed = Mathf.Max(_moveSpeed - _moveAccel * Time.deltaTime * 2f, _minSpeed);
+        }
+        else _moveSpeed = Mathf.Min(_moveSpeed + _moveAccel * Time.deltaTime, _maxSpeed);
+        //handle turn acceleration
+        if (_turnDir.magnitude <= 0)
+        {
+            _turnRate = Mathf.Max(_turnRate - _turnAccel * Time.deltaTime * 2f, _minTurnRate);
+        }
+        else _turnRate = Mathf.Min(_turnRate + _turnAccel * Time.deltaTime, _maxTurnRate);
 
 
         //create final move vector
         _moveDir = new Vector3(_inputDir.x * _moveSpeed, _verticalVel, _inputDir.y * _moveSpeed);
         _cc.Move(_cc.transform.rotation * _moveDir * Time.deltaTime);
     }
-    //method for handling touch input. makes sure that the player doesnt drift 
+
+
+    //method for handling touch input. is going to make sure that the player doesnt drift 
+    //could be deprecated
     void HandleTouch(Vector2 inputVector, Collider2D touchArea)
     {
         //make sure touch is within its designated area
         if (!touchArea.bounds.Contains(inputVector))
         {
             //setting _inputDir to zero here causes an abrupt stop to the player's movement
-            //thats okay tho, as acceleration/deacceleration will be handled seperate from _inputDir 
+            //thats okay tho, as acceleration/deacceleration will be handled seperate from _inputDir
             _inputDir = Vector2.zero;
             return;
         }
