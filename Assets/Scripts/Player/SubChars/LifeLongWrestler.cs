@@ -9,11 +9,12 @@ public interface ICharacter
     public void CharacterInit();
     public void PickUpWeapon(Weapon weaponToPickup);
     public string Name();
-
+    public Weapon CurrWeapon();
 }
 
 public class LifeLongWrestler : PlayerMove, ICharacter
 {
+    public Weapon CurrWeapon() => Weapon;
     public string Name() => _name;
 
     private void OnEnable()
@@ -29,8 +30,12 @@ public class LifeLongWrestler : PlayerMove, ICharacter
 
     public void CharacterLoop(InputHandler input)
     {
-        MoveAndTurnLoop(input.Turn, input.Move, input.Special);
+        MoveAndTurnLoop(input.Turn, input.Move, input.Jump);
         ShootUpdate();
+    }
+    public override void Special()
+    {
+        Debug.Log("lifelong wrestler special used");
     }
 }
 

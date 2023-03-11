@@ -11,6 +11,7 @@ public class InputHandler : MonoBehaviour
     //movement
     private InputAction _move;
     private InputAction _turn;
+    private InputAction _jump;
 
     //weapon usage
     private InputAction _shootHigh;
@@ -40,7 +41,13 @@ public class InputHandler : MonoBehaviour
             return _turn;
         }
     }
-
+    public InputAction Jump
+    {
+        get
+        {
+            return _jump;
+        }
+    }
     //weapon usage
     public InputAction ShootLow
     {
@@ -132,6 +139,9 @@ public class InputHandler : MonoBehaviour
         _turn = _controls.Player.Turn;
         _turn.Enable();
 
+        _jump = _controls.Player.Jump;
+        _jump.Enable();
+
         _shootHigh = _controls.Player.ShootHigh;
         _shootHigh.Enable();
 
@@ -151,6 +161,7 @@ public class InputHandler : MonoBehaviour
         _prevChar.Disable();
         _move.Disable();
         _turn.Disable();
+        _jump.Disable();
         _shootHigh.Disable();
         _shootLow.Disable();
         _interact.Disable();

@@ -6,7 +6,7 @@ public class PickUpBehaviour : MonoBehaviour
 {
     public WeaponData Weapon;
     public Weapon weapon;
-    private void Awake() => weapon = new(Weapon);
+    private void Start() => weapon = new(Weapon);
     
     private void OnTriggerEnter(Collider other)
     {

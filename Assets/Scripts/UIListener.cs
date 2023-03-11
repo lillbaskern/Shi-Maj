@@ -12,7 +12,7 @@ public class UIListener : MonoBehaviour
         PlayerHead.TextChanged += OnCharChanged;
     }
     //i feel like with one of these classes i could probably make it use generics to work for many aspects of the UI, but it is just out of my reach at the moment
-    void OnCharChanged(object sender, UiTextChangeEventArgs args)
+    void OnCharChanged(object sender, CharChangeEventArgs args)
     {
         _text.text = args.text;
     }

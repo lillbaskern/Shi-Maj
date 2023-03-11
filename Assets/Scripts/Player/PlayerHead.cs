@@ -9,24 +9,25 @@ using System;
 //for the sake of this assignment, it also handles characters and character switching
 public class PlayerHead : MonoBehaviour
 {
-    public static event EventHandler<UiTextChangeEventArgs> TextChanged;
-    public static event EventHandler<WeaponChangeEventArgs> WeaponChanged;
+    public static event EventHandler<CharChangeEventArgs> TextChanged;
+    public static Action UpdateWeaponNameUIUnarmed;
+
     //the viewmodel's camera's GameObject
     GameObject _uiCamera;
 
     InputHandler _input;
 
-    
+
     PlayerShoot _shooter;
-    
+
     public static List<ICharacter> Characters = new();
     ICharacter _currChar;
-    
+
     public ICharacter CurrentCharacter
     {
         get { return _currChar; }
     }
-    
+
     private int _currCharIndex = 0;
     [SerializeField] private int hp;
     private bool hasInit;
@@ -45,13 +46,14 @@ public class PlayerHead : MonoBehaviour
 
     IEnumerator Start()
     {
+        CurrentWeaponListener.PlayerHead = this;
         //let character scripts do their thing
         yield return new WaitForEndOfFrame();
 
         _currChar = Characters[_currCharIndex];
-        
+
         //invoke event
-        UiTextChangeEventArgs args = new(_currChar.Name());
+        CharChangeEventArgs args = new(_currChar.Name());
         TextChanged?.Invoke(this, args);
 
         _uiCamera = GameObject.Find("UICamera");
@@ -82,12 +84,19 @@ public class PlayerHead : MonoBehaviour
                 return;
             }
             _currChar = Characters[_currCharIndex];
-            
-            //invoke event
-            UiTextChangeEventArgs args = new(_currChar.Name());
-            TextChanged?.Invoke(this, args);
-
             Debug.Log("switched to " + _currChar);
+
+            //invoke events
+            CharChangeEventArgs args = new(_currChar.Name());
+            TextChanged?.Invoke(this, args);
+            var weapon = _currChar.CurrWeapon();
+            if (weapon == null)
+            {
+                UpdateWeaponNameUIUnarmed?.Invoke();
+                return;
+            }
+            WeaponUIEventArgs eventArgs = new(weapon);
+            weapon?.UpdateUI(eventArgs, this);            
         }
 
         if (_input.PrevChar.WasPressedThisFrame())
@@ -99,12 +108,16 @@ public class PlayerHead : MonoBehaviour
                 return;
             }
             _currChar = Characters[_currCharIndex];
+            Debug.Log("switched to " + _currChar);
 
             //invoke event
-            UiTextChangeEventArgs args = new(_currChar.Name());
+            CharChangeEventArgs args = new(_currChar.Name());
             TextChanged?.Invoke(this, args);
+            var weapon = _currChar.CurrWeapon();
+            WeaponUIEventArgs eventArgs = new(weapon);
+            weapon?.UpdateUI(eventArgs, this);
 
-            Debug.Log("switched to " + _currChar);
+
         }
 
         _currChar.CharacterLoop(_input);
@@ -118,19 +131,30 @@ public class PlayerHead : MonoBehaviour
 }
 
 //event argument classes
-public class WeaponChangeEventArgs : EventArgs
+public class WeaponUIEventArgs : EventArgs
 {
-    public WeaponChangeEventArgs(Weapon weapon)
+    public WeaponUIEventArgs(Weapon weapon)
     {
+        if (weapon == null)
+        {
+            WeaponName = "Unarmed";
+            return;
+        }
+        WeaponName = weapon.WeaponName;
         WeaponSprite = weapon.WeaponSprite;
+        currMag = weapon.CurrMag;
+        AmmoCache = weapon.AmmoStock;
     }
+    public string WeaponName;
+    public int currMag;
+    public int AmmoCache;
     public Sprite WeaponSprite;
     //todo: make and package weapon equip animations (inside scriptable object)
     public Animation weaponEquipAnim;
 }
-public class UiTextChangeEventArgs : EventArgs
+public class CharChangeEventArgs : EventArgs
 {
-    public UiTextChangeEventArgs(string input)
+    public CharChangeEventArgs(string input)
     {
         text = input;
     }

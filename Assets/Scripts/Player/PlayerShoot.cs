@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 using UnityEngine.InputSystem;
 
 public class Weapon
 {
+    public event EventHandler<WeaponUIEventArgs> AmmoUpdate;
     public Weapon(WeaponData input)
     {
         IsReloading = false;
@@ -19,8 +21,8 @@ public class Weapon
         _fireRate = new(input.FireRate);
         AmmoStock = input.AmmoStock;
         WeaponSprite = input.WeaponSprite;
+        CurrentWeaponListener.Instance.SubscribeToWeapon(this);
     }
-
     public Sprite WeaponSprite { get; protected set; }
 
     public bool IsReloading { get; protected set; }
@@ -41,7 +43,7 @@ public class Weapon
         }
         set
         {
-            if(value + _ammoStock > AmmoCapacity) _ammoStock = AmmoCapacity;
+            if (value + _ammoStock > AmmoCapacity) _ammoStock = AmmoCapacity;
             else _ammoStock = _ammoStock + value;
         }
     }
@@ -51,7 +53,6 @@ public class Weapon
     public float Range { get; private set; }
     private WaitForSeconds _reloadTime { get; set; }
     private WaitForSeconds _fireRate;
-
 
     public virtual IEnumerator Reload()
     {
@@ -69,13 +70,19 @@ public class Weapon
 
         yield return _reloadTime;
         IsReloading = false;
+        WeaponUIEventArgs args = new(this);
+        AmmoUpdate?.Invoke(this, args);
         Debug.Log("DONE reloading. Current ammo stock is: " + AmmoStock);
     }
     //Base fire method for any type of weapon which attacks once per input (doesnt even have to be just a gun)
     public virtual void Fire(Transform player, float radius, Vector3 shootPoint)
     {
-        if (CurrMag == 0 || IsReloading) return;
-        CurrMag -=1;
+        if (CurrMag <= 0 || IsReloading) return;
+
+        CurrMag -= 1;
+        WeaponUIEventArgs args = new(this);
+        AmmoUpdate?.Invoke(this, args);
+
         RaycastHit hit;
         if (Physics.Raycast(shootPoint, player.TransformDirection(Vector3.forward), out hit, Range))
         {
@@ -86,34 +93,32 @@ public class Weapon
                 enemy.HP = Damage;
                 return;
             }
-
-            //experimental things below. The code is meant to make the fire function more lenient, more akin to how it functions in old school doom 
-            //if it doesnt function as desired just scrap it and start from scratch with it, 
-            //IDEA: im sure you could place a trigger on the raycasthit's point, and have some method on it return the enemy closest to the triggers center 
-            Collider[] hitCollider = new Collider[1];
-            int colliders = Physics.OverlapSphereNonAlloc(hit.point, radius, hitCollider);
-            for (int i = 0; i < colliders; i++)
-            {
-                //Whenever it says "HP = damage" or something of the like, where HP and damage are both ints, it means HP -= damage, but in an obstructed way
-                if (hitCollider[i].TryGetComponent<EnemyHead>(out EnemyHead head)) head.HP = Damage;
-            }
         }
+
         Debug.Log("fired weapon: " + WeaponName + ". Ammo left in mag: " + CurrMag);
 
     }
+    public void UpdateUI(WeaponUIEventArgs args, object sender)
+    {
+        AmmoUpdate?.Invoke(sender, args);
+    }
 }
+
 
 public class PlayerShoot : MonoBehaviour
 {
-    
+    public event EventHandler<WeaponUIEventArgs> WeaponUIChange;
     protected InputHandler _input;
-    protected static Transform _highCrosshair;
-    [SerializeField] static GameObject _UiHighCrosshair;
+    protected Transform _highCrosshair;
+    [SerializeField] GameObject _uiHighCrosshair;
+    [SerializeField] Transform _uiLowCrosshair;
+    [SerializeField] Transform _lowCrosshair;
     public Weapon Weapon { get; protected set; }
 
     //these transforms are from where raycasts will fire
     [SerializeField] static Transform _lowShootPoint;
     [SerializeField] static Transform _highShootPoint;
+
 
     bool hasInit = false;
 
@@ -125,6 +130,8 @@ public class PlayerShoot : MonoBehaviour
         _lowShootPoint = GameObject.Find("LowShootOrigin").transform;
         _highShootPoint = GameObject.Find("HighShootOrigin").transform;
         _highCrosshair = GameObject.Find("HighCrosshairDecal").transform;
+        _lowCrosshair = GameObject.Find("LowCrosshairDecal").transform;
+        CurrentWeaponListener.Shoots.Add(this);
 
         if (_highShootPoint == null || _lowShootPoint == null)
         {
@@ -132,8 +139,8 @@ public class PlayerShoot : MonoBehaviour
             Debug.LogWarning("Player will now self destruct in 10...9...");
             this.gameObject.SetActive(false);
         }
-
-        _UiHighCrosshair = GameObject.Find("HIGHcrosshair");
+        _uiLowCrosshair = GameObject.Find("LOWcrosshair").transform;
+        _uiHighCrosshair = GameObject.Find("HIGHcrosshair");
         this.hasInit = true;
     }
 
@@ -144,6 +151,7 @@ public class PlayerShoot : MonoBehaviour
         Debug.DrawRay(_lowShootPoint.position, _lowShootPoint.TransformDirection(Vector3.forward) * 100f, Color.blue);
         Debug.DrawRay(_highShootPoint.position, _highShootPoint.TransformDirection(Vector3.forward) * 100f, Color.green);
         ProjectHighCrossHair();
+        ProjectLowCrossHair();
         PollForInput();
 
         //handle things that are weapon-related after this guard clause
@@ -170,35 +178,67 @@ public class PlayerShoot : MonoBehaviour
             _highCrosshair.position = hit.point;
             _highCrosshair.rotation = this.transform.rotation;
             _highCrosshair.gameObject.SetActive(true);
-            _UiHighCrosshair.SetActive(false);
+            _uiHighCrosshair.SetActive(false);
             return;
         }
         _highCrosshair.gameObject.SetActive(false);
-        _UiHighCrosshair.SetActive(true);
+        _uiHighCrosshair.SetActive(true);
+    }
+    protected virtual void ProjectLowCrossHair()
+    {
+        //if (_highCrosshair == null) return;
+        RaycastHit hit;
+        //to make the raycast work even if you are unarmed, we use the ternary operator to set a new floats value based on whether or not you have a weapon
+        float range = Weapon == null ? 30f : Weapon.Range;
+        if (Physics.Raycast(_lowShootPoint.position, transform.TransformDirection(Vector3.forward), out hit, range))
+        {
+            _lowCrosshair.position = hit.point;
+            _lowCrosshair.rotation = this.transform.rotation;
+            _lowCrosshair.gameObject.SetActive(true);
+            _uiLowCrosshair.gameObject.SetActive(false);
+            return;
+        }
+        _lowCrosshair.gameObject.SetActive(false);
+        _uiLowCrosshair.gameObject.SetActive(true);
     }
 
-    protected virtual void PollForInput()
+    public virtual void Special()
     {
-
+        Debug.Log("special used");
+    }
+    protected void PollForInput()
+    {
+        if (_input.Special.WasPressedThisFrame()) Special();
         if (_input.ShootHigh.WasPressedThisFrame())
         {
-            Weapon?.Fire(this.transform, 10f, _highShootPoint.position);
+            if (Weapon == null) return;
+            if(Weapon.IsReloading) return;
+            Weapon.Fire(this.transform, 10f, _highShootPoint.position);
+            WeaponUIEventArgs args = new(Weapon);
+            WeaponUIChange?.Invoke(this, args);
             //im hoping this return only keeps the player from shooting both high and low on the same frame
             return;
         }
         if (_input.ShootLow.WasPressedThisFrame())
         {
-            Weapon?.Fire(this.transform, 10f, _lowShootPoint.position);
+            if (Weapon == null) return;
+            if(Weapon.IsReloading) return;
+            Weapon.Fire(this.transform, 10f, _lowShootPoint.position);
+            WeaponUIEventArgs args = new(Weapon);
+            WeaponUIChange?.Invoke(this, args);
         }
     }
     public void PickUpWeapon(Weapon weaponToPickup)
     {
+
         if (weaponToPickup == Weapon)
         {
             //weapons have a special setter for ammostock which makes sure they stay within the limits of their max ammo capacity
             Weapon.AmmoStock = weaponToPickup.AmmoStock;
             return;
         }
+        WeaponUIEventArgs args = new(weaponToPickup);
+        WeaponUIChange.Invoke(this, args);
         Weapon = weaponToPickup;
     }
 }
