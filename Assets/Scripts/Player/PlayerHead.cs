@@ -9,7 +9,7 @@ using System;
 //for the sake of this assignment, it also handles characters and character switching
 public class PlayerHead : MonoBehaviour
 {
-    public static event EventHandler<CharChangeEventArgs> TextChanged;
+    public static event EventHandler<CharChangeEventArgs> TextChanged; //handling events in such disorganized ways could be very dangerous
     public static Action UpdateWeaponNameUIUnarmed;
 
     //the viewmodel's camera's GameObject
@@ -96,7 +96,7 @@ public class PlayerHead : MonoBehaviour
                 return;
             }
             WeaponUIEventArgs eventArgs = new(weapon);
-            weapon?.UpdateUI(eventArgs, this);            
+            weapon?.UpdateUI(eventArgs, this);
         }
 
         if (_input.PrevChar.WasPressedThisFrame())
