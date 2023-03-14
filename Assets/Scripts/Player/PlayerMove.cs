@@ -35,6 +35,7 @@ public class PlayerMove : PlayerShoot
 
     Vector3 _moveDir;
     private float _verticalVel;
+    private float _coyoteTime = 0;
 
     public static Collider2D _topTouchArea;
     public static Vector2 _topTouchAreaBeginPoint;
@@ -70,14 +71,20 @@ public class PlayerMove : PlayerShoot
 
         //Set isgrounded
         IsGrounded = _cc.isGrounded;
-        if (IsGrounded) _verticalVel = 0;
+        if (IsGrounded)
+        {
+            _verticalVel = 0;
+            _coyoteTime = 0.5f;
+        }
+        else _coyoteTime -= Time.deltaTime;
 
 
 
         //jumping and gravity (prototype only)
-        if (Jump.WasPressedThisFrame() && IsGrounded)
+        if (Jump.WasPressedThisFrame() && _coyoteTime > 0)
         {
             _verticalVel += Mathf.Sqrt(_jumpHeight * -2f * Physics.gravity.y);
+            _coyoteTime = 0;
         }
         //you can further dissolve Physics.gravity.y into float _MaxFallSpeed 
         _verticalVel += Physics.gravity.y * Time.deltaTime;
