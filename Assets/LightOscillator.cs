@@ -16,7 +16,7 @@ public class LightOscillator : MonoBehaviour
     {        
         // _pastBrightness = _currentBrightness;
         // _currentBrightness = _lightToOscillate.intensity;
-        // float _newBrightness = _pastBrightness -
+        // float _newBrightness = _pastBrightness == _currentBrightness?  
 
     }
 }
