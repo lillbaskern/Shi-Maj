@@ -19,6 +19,7 @@ public class Soldier : PlayerMove, ICharacter
     {
         MoveAndTurnLoop(input.Turn, input.Move, input.Jump);
         ShootUpdate();
+        
     }
     public override void Special()
     {

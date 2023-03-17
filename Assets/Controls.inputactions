@@ -267,7 +267,7 @@
                 {
                     "name": "Gamepad/Touch",
                     "id": "ae7df5f4-a816-4668-83ae-890fffc70d45",
-                    "path": "2DVector",
+                    "path": "2DVector(mode=2)",
                     "interactions": "",
                     "processors": "",
                     "groups": "",

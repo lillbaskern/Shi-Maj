@@ -35,7 +35,8 @@ public class PlayerMove : PlayerShoot
 
     Vector3 _moveDir;
     private float _verticalVel;
-    private float _coyoteTime = 0;
+    [SerializeField] float _baseCoyoteTime;
+    private float _currCoyoteTime = 0;
 
     public static Collider2D _topTouchArea;
     public static Vector2 _topTouchAreaBeginPoint;
@@ -68,23 +69,25 @@ public class PlayerMove : PlayerShoot
 
         if (!move.inProgress) _inputDir = Vector2.zero;
 
+        ApplyDeadZone(ref _inputDir.x);
 
         //Set isgrounded
         IsGrounded = _cc.isGrounded;
         if (IsGrounded)
         {
             _verticalVel = 0;
-            _coyoteTime = 0.5f;
+            _currCoyoteTime = _baseCoyoteTime;
         }
-        else _coyoteTime -= Time.deltaTime;
+        //using either min or max is a great way of keeping variables under or above a certain threshhold
+        else _currCoyoteTime = Mathf.Max(_currCoyoteTime - Time.deltaTime, 0);
 
 
 
         //jumping and gravity (prototype only)
-        if (Jump.WasPressedThisFrame() && _coyoteTime > 0)
+        if (Jump.WasPressedThisFrame() && _currCoyoteTime > 0)
         {
-            _verticalVel += Mathf.Sqrt(_jumpHeight * -2f * Physics.gravity.y);
-            _coyoteTime = 0;
+            _verticalVel = Mathf.Sqrt(_jumpHeight * -2f * Physics.gravity.y);
+            _currCoyoteTime = 0;
         }
         //you can further dissolve Physics.gravity.y into float _MaxFallSpeed 
         _verticalVel += Physics.gravity.y * Time.deltaTime;
@@ -115,6 +118,10 @@ public class PlayerMove : PlayerShoot
         _cc.Move(_cc.transform.rotation * _moveDir * Time.deltaTime);
     }
 
+    public static void ApplyDeadZone(ref float input)
+    {
+        if(Mathf.Abs(input) < 0.2f) input = 0;
+    }
 
     //method for handling touch input. is going to make sure that the player doesnt drift 
     //could be deprecated
