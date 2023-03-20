@@ -53,7 +53,7 @@ public class PlayerHead : MonoBehaviour
         _currChar = Characters[_currCharIndex];
 
         //invoke event
-        CharChangeEventArgs args = new(_currChar.Name());
+        CharChangeEventArgs args = new(_currChar.GetName());
         TextChanged?.Invoke(this, args);
 
         _uiCamera = GameObject.Find("UICamera");
@@ -87,9 +87,9 @@ public class PlayerHead : MonoBehaviour
             Debug.Log("switched to " + _currChar);
 
             //invoke events
-            CharChangeEventArgs args = new(_currChar.Name());
+            CharChangeEventArgs args = new(_currChar.GetName());
             TextChanged?.Invoke(this, args);
-            var weapon = _currChar.CurrWeapon();
+            var weapon = _currChar.GetCurrWeapon();
             if (weapon == null)
             {
                 UpdateWeaponNameUIUnarmed?.Invoke();
@@ -111,9 +111,9 @@ public class PlayerHead : MonoBehaviour
             Debug.Log("switched to " + _currChar);
 
             //invoke event
-            CharChangeEventArgs args = new(_currChar.Name());
+            CharChangeEventArgs args = new(_currChar.GetName());
             TextChanged?.Invoke(this, args);
-            var weapon = _currChar.CurrWeapon();
+            var weapon = _currChar.GetCurrWeapon();
             WeaponUIEventArgs eventArgs = new(weapon);
             weapon?.UpdateUI(eventArgs, this);
 

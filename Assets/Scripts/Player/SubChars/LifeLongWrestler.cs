@@ -8,14 +8,14 @@ public interface ICharacter
     public void CharacterLoop(InputHandler input);
     public void CharacterInit();
     public void PickUpWeapon(Weapon weaponToPickup);
-    public string Name();
-    public Weapon CurrWeapon();
+    public string GetName();
+    public Weapon GetCurrWeapon();
 }
 
 public class LifeLongWrestler : PlayerMove, ICharacter
 {
-    public Weapon CurrWeapon() => Weapon;
-    public string Name() => _name;
+    public Weapon GetCurrWeapon() => CurrWeapon;
+    public string GetName() => _name;
 
     private void OnEnable()
     {
@@ -24,7 +24,8 @@ public class LifeLongWrestler : PlayerMove, ICharacter
     }
     public void CharacterInit()
     {
-        //playermove uses awake so we dont need to rewrite its init to a seperate method to be called here, but shoot needs it though.
+        //playermove uses awake so we dont need to rewrite its init to a seperate method to be called here
+        //but shoot needs it though.
         base.InitShoot();
     }
 

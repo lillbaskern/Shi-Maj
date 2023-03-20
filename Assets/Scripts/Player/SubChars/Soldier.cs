@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Soldier : PlayerMove, ICharacter
 {
-    public string Name() => _name;
-    public Weapon CurrWeapon() => Weapon;
+    public string GetName() => _name;
+    public Weapon GetCurrWeapon() => CurrWeapon;
 
     private void OnEnable()
     {
@@ -19,7 +19,6 @@ public class Soldier : PlayerMove, ICharacter
     {
         MoveAndTurnLoop(input.Turn, input.Move, input.Jump);
         ShootUpdate();
-        
     }
     public override void Special()
     {

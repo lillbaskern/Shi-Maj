@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 public class GameDeveloper : PlayerMove, ICharacter
 {
-    public Weapon CurrWeapon() => Weapon;
-    public string Name() => _name;
+    public Weapon GetCurrWeapon() => CurrWeapon;
+    public string GetName() => _name;
     private void OnEnable()
     {
         SendToCharList(this);
