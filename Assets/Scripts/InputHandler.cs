@@ -13,13 +13,17 @@ public class InputHandler : MonoBehaviour
     private InputAction _turn;
     private InputAction _jump;
 
-    //weapon usage
+    //attacking/shooting
     private InputAction _shootHigh;
     private InputAction _shootLow;
 
-    //character switching
+    //character switching (on hold for now)
     private InputAction _nextChar;
     private InputAction _prevChar;
+
+    //weapon switching
+    private InputAction _nextWeapon;
+    private InputAction _prevWeapon;
 
     //misc
     private InputAction _special;
@@ -64,14 +68,36 @@ public class InputHandler : MonoBehaviour
         }
     }
 
+    public InputAction NextWeapon
+    {
+        get
+        {
+            return _nextWeapon;
+        }
+    }
+
+    public InputAction PrevWeapon
+    {
+        get
+        {
+            return _prevWeapon;
+        }
+    }
+
     //character switching
     public InputAction NextChar
     {
-        get { return _nextChar; }
+        get
+        {
+            return _nextChar;
+        }
     }
     public InputAction PrevChar
     {
-        get { return _prevChar; }
+        get
+        {
+            return _prevChar;
+        }
     }
 
     //misc
@@ -129,7 +155,7 @@ public class InputHandler : MonoBehaviour
         Debug.Log("setinputactions called");
         _nextChar = _controls.Player.NextChar;
         _nextChar.Enable();
-        
+
         _prevChar = _controls.Player.PrevChar;
         _prevChar.Enable();
 
@@ -148,6 +174,12 @@ public class InputHandler : MonoBehaviour
         _shootLow = _controls.Player.ShootLow;
         _shootLow.Enable();
 
+        _nextWeapon = _controls.Player.NextWeapon;
+        _nextWeapon.Enable();
+
+        _prevWeapon = _controls.Player.PrevWeapon;
+        _prevWeapon.Enable();
+
         _interact = _controls.Player.Interact;
         _interact.Enable();
 
@@ -157,6 +189,8 @@ public class InputHandler : MonoBehaviour
 
     private void OnDisable()
     {
+        _nextWeapon.Disable();
+        _prevWeapon.Disable();
         _nextChar.Disable();
         _prevChar.Disable();
         _move.Disable();

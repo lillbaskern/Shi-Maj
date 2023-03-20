@@ -107,6 +107,24 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""NextWeapon"",
+                    ""type"": ""Button"",
+                    ""id"": ""a8b3213b-a856-49de-9c5c-be078b0c0856"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PrevWeapon"",
+                    ""type"": ""Button"",
+                    ""id"": ""659627ac-af86-4281-b5fe-88b8d3debb83"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -365,34 +383,12 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 },
                 {
                     ""name"": """",
-                    ""id"": ""ae2afe1e-32fa-4e64-a2e4-ecb8a2ba1064"",
-                    ""path"": ""<Keyboard>/e"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""NextChar"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
                     ""id"": ""7a5cab13-5d22-4c58-ad8a-cd20ce1e8f42"",
                     ""path"": ""<Gamepad>/buttonEast"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""NextChar"",
-                    ""isComposite"": false,
-                    ""isPartOfComposite"": false
-                },
-                {
-                    ""name"": """",
-                    ""id"": ""3e613741-8810-4f0f-ad1b-ce00da76ef13"",
-                    ""path"": ""<Keyboard>/q"",
-                    ""interactions"": """",
-                    ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""PrevChar"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -426,6 +422,28 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""groups"": """",
                     ""action"": ""Jump"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c8983064-7169-4007-b770-57a8110bdf05"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""NextWeapon"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""de491c5c-f611-461d-94ee-e3fa4086dd26"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""PrevWeapon"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -462,6 +480,8 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         m_Player_NextChar = m_Player.FindAction("NextChar", throwIfNotFound: true);
         m_Player_PrevChar = m_Player.FindAction("PrevChar", throwIfNotFound: true);
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
+        m_Player_NextWeapon = m_Player.FindAction("NextWeapon", throwIfNotFound: true);
+        m_Player_PrevWeapon = m_Player.FindAction("PrevWeapon", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -530,6 +550,8 @@ public partial class @Controls : IInputActionCollection2, IDisposable
     private readonly InputAction m_Player_NextChar;
     private readonly InputAction m_Player_PrevChar;
     private readonly InputAction m_Player_Jump;
+    private readonly InputAction m_Player_NextWeapon;
+    private readonly InputAction m_Player_PrevWeapon;
     public struct PlayerActions
     {
         private @Controls m_Wrapper;
@@ -543,6 +565,8 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         public InputAction @NextChar => m_Wrapper.m_Player_NextChar;
         public InputAction @PrevChar => m_Wrapper.m_Player_PrevChar;
         public InputAction @Jump => m_Wrapper.m_Player_Jump;
+        public InputAction @NextWeapon => m_Wrapper.m_Player_NextWeapon;
+        public InputAction @PrevWeapon => m_Wrapper.m_Player_PrevWeapon;
         public InputActionMap Get() { return m_Wrapper.m_Player; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -579,6 +603,12 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 @Jump.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnJump;
                 @Jump.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnJump;
                 @Jump.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnJump;
+                @NextWeapon.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnNextWeapon;
+                @NextWeapon.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnNextWeapon;
+                @NextWeapon.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnNextWeapon;
+                @PrevWeapon.started -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPrevWeapon;
+                @PrevWeapon.performed -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPrevWeapon;
+                @PrevWeapon.canceled -= m_Wrapper.m_PlayerActionsCallbackInterface.OnPrevWeapon;
             }
             m_Wrapper.m_PlayerActionsCallbackInterface = instance;
             if (instance != null)
@@ -610,6 +640,12 @@ public partial class @Controls : IInputActionCollection2, IDisposable
                 @Jump.started += instance.OnJump;
                 @Jump.performed += instance.OnJump;
                 @Jump.canceled += instance.OnJump;
+                @NextWeapon.started += instance.OnNextWeapon;
+                @NextWeapon.performed += instance.OnNextWeapon;
+                @NextWeapon.canceled += instance.OnNextWeapon;
+                @PrevWeapon.started += instance.OnPrevWeapon;
+                @PrevWeapon.performed += instance.OnPrevWeapon;
+                @PrevWeapon.canceled += instance.OnPrevWeapon;
             }
         }
     }
@@ -634,5 +670,7 @@ public partial class @Controls : IInputActionCollection2, IDisposable
         void OnNextChar(InputAction.CallbackContext context);
         void OnPrevChar(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
+        void OnNextWeapon(InputAction.CallbackContext context);
+        void OnPrevWeapon(InputAction.CallbackContext context);
     }
 }

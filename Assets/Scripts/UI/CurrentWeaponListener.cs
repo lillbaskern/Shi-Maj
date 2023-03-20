@@ -22,7 +22,7 @@ public class CurrentWeaponListener : MonoBehaviour
     }
     IEnumerator Start()
     {
-        yield return new WaitForSeconds(0.1f);
+        yield return new WaitForSeconds(0.1f);//this is unnecessary cus u can set the execution order in your project settings
         foreach (PlayerShoot shoot in Shoots)
         {
             shoot.WeaponUIChange += OnWeaponUiChange;
@@ -40,5 +40,13 @@ public class CurrentWeaponListener : MonoBehaviour
     {
         _textMeshAmmo.text = "";
         _textMeshWeapon.text = "Unarmed";
+    }
+    
+    private void OnDisable()
+    {
+        foreach (PlayerShoot shoot in Shoots)
+        {
+            shoot.WeaponUIChange -= OnWeaponUiChange;
+        }
     }
 }
