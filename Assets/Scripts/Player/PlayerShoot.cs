@@ -19,13 +19,11 @@ public class Weapon
         Range = input.Range;
         _fireRate = new(input.FireRate);
         AmmoStock = input.AmmoStock;
-        WeaponSprite = input.WeaponSprite;
         CurrentWeaponListener.Instance.SubscribeToWeapon(this);
     }
     public Animator Animator{ get; private set; }
 
     public event EventHandler<WeaponUIEventArgs> AmmoUpdate;
-    public Sprite WeaponSprite { get; protected set; }
 
     public bool IsReloading { get; protected set; }
     public string WeaponName { get; private set; }

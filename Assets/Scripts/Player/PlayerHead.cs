@@ -138,19 +138,17 @@ public class WeaponUIEventArgs : EventArgs
         if (weapon == null)
         {
             WeaponName = "Unarmed";
+            AmmoCache = -1;
             return;
         }
         WeaponName = weapon.WeaponName;
-        WeaponSprite = weapon.WeaponSprite;
         currMag = weapon.CurrMag;
         AmmoCache = weapon.AmmoStock;
     }
     public string WeaponName;
     public int currMag;
     public int AmmoCache;
-    public Sprite WeaponSprite;
-    //todo: make and package weapon equip animations (inside scriptable object)
-    public Animation weaponEquipAnim;
+    public GameObject WeaponPrefab;
 }
 public class CharChangeEventArgs : EventArgs
 {

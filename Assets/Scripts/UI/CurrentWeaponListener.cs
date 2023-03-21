@@ -34,6 +34,11 @@ public class CurrentWeaponListener : MonoBehaviour
     void OnWeaponUiChange(object sender, WeaponUIEventArgs args)
     {
         if (args.WeaponName != null) _textMeshWeapon.text = args.WeaponName;
+        if (args.AmmoCache == -1)
+        {
+            _textMeshAmmo.text = "";
+            return;
+        }
         _textMeshAmmo.text = $"{args.currMag} | {args.AmmoCache}";
     }
     void OnUpdateWeaponUIUnarmed()
@@ -41,7 +46,7 @@ public class CurrentWeaponListener : MonoBehaviour
         _textMeshAmmo.text = "";
         _textMeshWeapon.text = "Unarmed";
     }
-    
+
     private void OnDisable()
     {
         foreach (PlayerShoot shoot in Shoots)
