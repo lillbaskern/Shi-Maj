@@ -46,7 +46,7 @@ public class PlayerHead : MonoBehaviour
 
     IEnumerator Start()
     {
-        CurrentWeaponListener.PlayerHead = this;
+        CurrentWeaponTextListener.PlayerHead = this;
         //let character scripts do their thing
         yield return new WaitForEndOfFrame();
 
@@ -145,6 +145,7 @@ public class WeaponUIEventArgs : EventArgs
         currMag = weapon.CurrMag;
         AmmoCache = weapon.AmmoStock;
     }
+    public bool IsSimple;
     public string WeaponName;
     public int currMag;
     public int AmmoCache;

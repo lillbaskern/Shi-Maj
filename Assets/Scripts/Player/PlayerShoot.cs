@@ -19,9 +19,8 @@ public class Weapon
         Range = input.Range;
         _fireRate = new(input.FireRate);
         AmmoStock = input.AmmoStock;
-        CurrentWeaponListener.Instance.SubscribeToWeapon(this);
+        CurrentWeaponTextListener.Instance.SubscribeToWeapon(this);
     }
-    public Animator Animator{ get; private set; }
 
     public event EventHandler<WeaponUIEventArgs> AmmoUpdate;
 
@@ -74,7 +73,6 @@ public class Weapon
         AmmoUpdate?.Invoke(this, args);
         Debug.Log("DONE reloading. Current ammo stock is: " + AmmoStock);
     }
-    //Base fire method for any type of weapon which attacks once per input (doesnt even have to be just a gun)
     public virtual void Fire(Transform player, float radius, Vector3 shootPoint)
     {
         if (CurrMag <= 0 || IsReloading) return;
@@ -95,7 +93,6 @@ public class Weapon
             }
         }
 
-        Debug.Log("fired weapon: " + WeaponName + ". Ammo left in mag: " + CurrMag);
 
     }
     public void UpdateUI(WeaponUIEventArgs args, object sender)
@@ -137,7 +134,7 @@ public class PlayerShoot : MonoBehaviour
         _highShootPoint = GameObject.Find("HighShootOrigin").transform;
         _highCrosshair = GameObject.Find("HighCrosshairDecal").transform;
         _lowCrosshair = GameObject.Find("LowCrosshairDecal").transform;
-        CurrentWeaponListener.Shoots.Add(this);
+        CurrentWeaponTextListener.Shoots.Add(this);
 
         if (_highShootPoint == null || _lowShootPoint == null)
         {
@@ -222,6 +219,7 @@ public class PlayerShoot : MonoBehaviour
             if (CurrWeapon.IsReloading) return;
             CurrWeapon.Fire(this.transform, 10f, _highShootPoint.position);
             WeaponUIEventArgs args = new(CurrWeapon);
+            args.IsSimple = true;
             WeaponUIChange?.Invoke(this, args);
             //im hoping this return only keeps the player from shooting both high and low on the same frame
             return;
@@ -232,11 +230,14 @@ public class PlayerShoot : MonoBehaviour
             if (CurrWeapon.IsReloading) return;
             CurrWeapon.Fire(this.transform, 10f, _lowShootPoint.position);
             WeaponUIEventArgs args = new(CurrWeapon);
+            args.IsSimple = true;
             WeaponUIChange?.Invoke(this, args);
         }
         if (_input.NextWeapon.WasPressedThisFrame())
         {
             if (_currWeaponIndex >= _weapons.Length - 1) return;
+            //Make sure the player can only access one "unarmed" weapon slot at a time
+            if(CurrWeapon == null && _weapons[_currWeaponIndex + 1] == null) return;
 
             WeaponUIEventArgs args = new(_weapons[++_currWeaponIndex]);
             WeaponUIChange?.Invoke(this, args);
@@ -246,7 +247,9 @@ public class PlayerShoot : MonoBehaviour
         if (_input.PrevWeapon.WasPressedThisFrame())
         {
             if(_currWeaponIndex <= 0) return;
-
+            if(CurrWeapon == null && _weapons[_currWeaponIndex - 1] == null) return;
+            
+            
             WeaponUIEventArgs args = new(_weapons[--_currWeaponIndex]);
             WeaponUIChange?.Invoke(this, args);
             CurrWeapon = _weapons[_currWeaponIndex];

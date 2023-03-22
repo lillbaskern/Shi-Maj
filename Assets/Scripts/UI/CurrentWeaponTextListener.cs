@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class CurrentWeaponListener : MonoBehaviour
+public class CurrentWeaponTextListener : MonoBehaviour
 {
 
-    public static CurrentWeaponListener Instance { get; private set; }
+    public static CurrentWeaponTextListener Instance { get; private set; }
     [SerializeField] TextMeshProUGUI _textMeshAmmo;
     [SerializeField] TextMeshProUGUI _textMeshWeapon;
     public static List<PlayerShoot> Shoots = new();
@@ -22,12 +22,13 @@ public class CurrentWeaponListener : MonoBehaviour
     }
     IEnumerator Start()
     {
-        yield return new WaitForSeconds(0.1f);//this is unnecessary cus u can set the execution order in your project settings
-        foreach (PlayerShoot shoot in Shoots)
-        {
-            shoot.WeaponUIChange += OnWeaponUiChange;
-        }
+        //wait for list Shoots to be filled
+        yield return new WaitForSeconds(0.1f);//this is unnecessary cus u can customize the execution order in your project settings
+        foreach (PlayerShoot shoot in Shoots) shoot.WeaponUIChange += OnWeaponUiChange;
+        
         PlayerHead.UpdateWeaponNameUIUnarmed += OnUpdateWeaponUIUnarmed;
+
+        //you start off as unarmed we'll set the text manually here
         _textMeshAmmo.text = "";
         _textMeshWeapon.text = "Unarmed";
     }
