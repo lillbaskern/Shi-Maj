@@ -4,6 +4,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Weapon Base Data")]
 public class WeaponData : ScriptableObject
 {
+    public AudioClip ShootSound;
     public string WeaponName;
     public float ReloadTime;
     public int Damage;

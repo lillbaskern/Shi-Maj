@@ -10,6 +10,7 @@ public class Weapon
     {
         IsReloading = false;
 
+        ShootSound = input.ShootSound;
         WeaponName = input.WeaponName;
         Damage = input.Damage;
         MagCapacity = input.BulletsPerMag;
@@ -22,18 +23,15 @@ public class Weapon
         CurrentWeaponTextListener.Instance.SubscribeToWeapon(this);
     }
 
+
     public event EventHandler<WeaponUIEventArgs> AmmoUpdate;
 
+    public AudioClip ShootSound { get; private set; }
+
+
+    //Weapon state variables
     public bool IsReloading { get; protected set; }
-    public string WeaponName { get; private set; }
-    public int Damage { get; protected set; }
-
-    //how many bullets are in your current mag
     public int CurrMag { get; protected set; }
-
-    //how many shots you can fire before needing to reload
-    public int MagCapacity { get; protected set; }
-    private int _ammoStock;
     public int AmmoStock
     {
         get
@@ -46,8 +44,15 @@ public class Weapon
             else _ammoStock = _ammoStock + value;
         }
     }
+    private int _ammoStock;
+    private bool _isReadyToFire = true;
 
-    //how many shots you can carry outside of the bullets in each mag
+
+
+    //variables which could almost be const if i just knew exactly what that would mean for the game
+    public string WeaponName { get; private set; }
+    public int Damage { get; protected set; }
+    public int MagCapacity { get; protected set; }
     public int AmmoCapacity { get; private set; }
     public float Range { get; private set; }
     private WaitForSeconds _reloadTime { get; set; }
@@ -71,12 +76,14 @@ public class Weapon
         IsReloading = false;
         WeaponUIEventArgs args = new(this);
         AmmoUpdate?.Invoke(this, args);
-        Debug.Log("DONE reloading. Current ammo stock is: " + AmmoStock);
     }
-    public virtual void Fire(Transform player, float radius, Vector3 shootPoint)
+    public virtual IEnumerator Fire(Transform player, float radius, Vector3 shootPoint, AudioSource source)
     {
-        if (CurrMag <= 0 || IsReloading) return;
+        if (CurrMag <= 0 || IsReloading) yield break;
+        if (!_isReadyToFire) yield break;
+        _isReadyToFire = false;
 
+        source.Play();
         CurrMag -= 1;
         WeaponUIEventArgs args = new(this);
         AmmoUpdate?.Invoke(this, args);
@@ -89,11 +96,10 @@ public class Weapon
                 //Whenever it says "HP = damage" or something of the like, where HP and damage are both ints, it means that the HP will subtract damage from itself
                 //this is because HP is a property and its setter runs a method named takedamage which simply subtracts the int damage from a private hp variable
                 enemy.HP = Damage;
-                return;
             }
         }
-
-
+        yield return _fireRate;
+        _isReadyToFire = true;
     }
     public void UpdateUI(WeaponUIEventArgs args, object sender)
     {
@@ -104,6 +110,7 @@ public class Weapon
 
 public class PlayerShoot : MonoBehaviour
 {
+    AudioSource _audioSource;
     public event EventHandler<WeaponUIEventArgs> WeaponUIChange;
 
     protected InputHandler _input;
@@ -129,6 +136,7 @@ public class PlayerShoot : MonoBehaviour
 
     public void InitShoot()
     {
+        _audioSource = GetComponent<AudioSource>();
         _input = GetComponent<InputHandler>();
         _lowShootPoint = GameObject.Find("LowShootOrigin").transform;
         _highShootPoint = GameObject.Find("HighShootOrigin").transform;
@@ -217,7 +225,7 @@ public class PlayerShoot : MonoBehaviour
         {
             if (CurrWeapon == null) return;
             if (CurrWeapon.IsReloading) return;
-            CurrWeapon.Fire(this.transform, 10f, _highShootPoint.position);
+            StartCoroutine(CurrWeapon.Fire(this.transform, 10f, _highShootPoint.position, _audioSource));
             WeaponUIEventArgs args = new(CurrWeapon);
             args.IsSimple = true;
             WeaponUIChange?.Invoke(this, args);
@@ -228,7 +236,7 @@ public class PlayerShoot : MonoBehaviour
         {
             if (CurrWeapon == null) return;
             if (CurrWeapon.IsReloading) return;
-            CurrWeapon.Fire(this.transform, 10f, _lowShootPoint.position);
+            StartCoroutine(CurrWeapon.Fire(this.transform, 10f, _highShootPoint.position, _audioSource));
             WeaponUIEventArgs args = new(CurrWeapon);
             args.IsSimple = true;
             WeaponUIChange?.Invoke(this, args);
@@ -237,22 +245,27 @@ public class PlayerShoot : MonoBehaviour
         {
             if (_currWeaponIndex >= _weapons.Length - 1) return;
             //Make sure the player can only access one "unarmed" weapon slot at a time
-            if(CurrWeapon == null && _weapons[_currWeaponIndex + 1] == null) return;
+            if (CurrWeapon == null && _weapons[_currWeaponIndex + 1] == null) return;
 
             WeaponUIEventArgs args = new(_weapons[++_currWeaponIndex]);
             WeaponUIChange?.Invoke(this, args);
             CurrWeapon = _weapons[_currWeaponIndex];
+            //set audio clip to current weapons shootsound
+            _audioSource.clip = CurrWeapon?.ShootSound;
 
         }
         if (_input.PrevWeapon.WasPressedThisFrame())
         {
-            if(_currWeaponIndex <= 0) return;
-            if(CurrWeapon == null && _weapons[_currWeaponIndex - 1] == null) return;
-            
-            
+            if (_currWeaponIndex <= 0) return;
+            if (CurrWeapon == null && _weapons[_currWeaponIndex - 1] == null) return;
+
+
             WeaponUIEventArgs args = new(_weapons[--_currWeaponIndex]);
             WeaponUIChange?.Invoke(this, args);
             CurrWeapon = _weapons[_currWeaponIndex];
+            //set audio clip to current weapons shootsound
+            _audioSource.clip = CurrWeapon?.ShootSound;
+
         }
     }
     public void PickUpWeapon(Weapon weaponToPickup)
@@ -269,6 +282,7 @@ public class PlayerShoot : MonoBehaviour
             {
                 _weapons[i] = weaponToPickup;
                 CurrWeapon = _weapons[i];
+                _audioSource.clip = CurrWeapon?.ShootSound;
                 WeaponUIEventArgs args = new(weaponToPickup);
                 WeaponUIChange.Invoke(this, args);
                 return;

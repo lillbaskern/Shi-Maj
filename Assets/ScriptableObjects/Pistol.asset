@@ -12,11 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc9ec36beaae841489b9610e291a1263, type: 3}
   m_Name: Pistol
   m_EditorClassIdentifier: 
+  ShootSound: {fileID: 8300000, guid: 86f08d0d0db27254b9f94147dbec0e79, type: 3}
   WeaponName: Pistol
   ReloadTime: 1.12
   Damage: 3
   BulletsPerMag: 7
   MaxBulletCapacity: 28
   Range: 50
-  FireRate: 0.2
+  FireRate: 0.15
   AmmoStock: 30
+  ViewmodelPrefab: {fileID: 0}
