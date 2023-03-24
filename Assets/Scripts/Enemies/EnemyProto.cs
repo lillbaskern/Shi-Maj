@@ -11,11 +11,18 @@ public class EnemyData : ScriptableObject
 
 public class EnemyProto : MonoBehaviour
 {
+    public int HP = 8;
+    public float Range;
+    public float FireCooldown;
+    public Transform Player;
+    public GameObject ProjectilePrefab;
 
-    public int Damage = 3;
-    //if the enemy collides with player, damage player
-    private void OnCollisionEnter(Collision other)
+    private void Update()
     {
-        if (other.gameObject.TryGetComponent<PlayerHead>(out PlayerHead head)) head.HP = Damage;
+        if (Vector3.Distance(this.transform.position, Player.position) <= Range && (int)(Time.time % FireCooldown) == 0)
+        {
+            var projectile = Instantiate(ProjectilePrefab);
+            
+        }
     }
 }
