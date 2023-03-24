@@ -119,6 +119,7 @@ public class PlayerShoot : MonoBehaviour
     [SerializeField] GameObject _uiHighCrosshair;
     [SerializeField] Transform _uiLowCrosshair;
     [SerializeField] Transform _lowCrosshair;
+    protected CharacterController _cc;
 
     //weapon variables
     public Weapon CurrWeapon { get; protected set; }
@@ -174,6 +175,14 @@ public class PlayerShoot : MonoBehaviour
 
     protected virtual void ProjectHighCrossHair()
     {
+
+        if (_cc.velocity.y >= 0.1f || _cc.velocity.y <= -0.1f)
+        {
+            _uiHighCrosshair.SetActive(false);
+            _highCrosshair.gameObject.SetActive(false);
+            return;
+        }
+
         //if (_highCrosshair == null) return;
         RaycastHit hit;
         //to make the raycast work even if you are unarmed, we use the ternary operator to set a new floats value based on whether or not you have a weapon
@@ -198,6 +207,12 @@ public class PlayerShoot : MonoBehaviour
     }
     protected virtual void ProjectLowCrossHair()
     {
+        if (_cc.velocity.y >= 0.1f || _cc.velocity.y <= -0.1f)
+        {
+            _uiLowCrosshair.gameObject.SetActive(false);
+            _lowCrosshair.gameObject.SetActive(false);
+            return;
+        }
         //if (_highCrosshair == null) return;
         RaycastHit hit;
         //to make the raycast work even if you are unarmed, we use the ternary operator to set a new floats value based on whether or not you have a weapon
@@ -223,6 +238,7 @@ public class PlayerShoot : MonoBehaviour
         if (_input.Special.WasPressedThisFrame()) Special();
         if (_input.ShootHigh.WasPressedThisFrame())
         {
+            if(_cc.velocity.y >= 0.1f || _cc.velocity.y <= -0.1f) return;
             if (CurrWeapon == null) return;
             if (CurrWeapon.IsReloading) return;
             StartCoroutine(CurrWeapon.Fire(this.transform, 10f, _highShootPoint.position, _audioSource));
@@ -234,6 +250,7 @@ public class PlayerShoot : MonoBehaviour
         }
         if (_input.ShootLow.WasPressedThisFrame())
         {
+            if(_cc.velocity.y >= 0.1f || _cc.velocity.y <= -0.1f) return;
             if (CurrWeapon == null) return;
             if (CurrWeapon.IsReloading) return;
             StartCoroutine(CurrWeapon.Fire(this.transform, 10f, _highShootPoint.position, _audioSource));

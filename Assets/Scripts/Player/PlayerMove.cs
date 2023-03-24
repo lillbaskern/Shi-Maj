@@ -24,7 +24,6 @@ public class PlayerMove : PlayerShoot
 
     //keeping this public for now. i doubt any gameplay method would even get close to changing this variable anyways
     public float LookSensitivity = 4;
-    CharacterController _cc;
 
 
     [SerializeField] protected float _jumpHeight = 100;
