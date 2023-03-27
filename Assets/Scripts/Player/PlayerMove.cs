@@ -72,7 +72,7 @@ public class PlayerMove : PlayerShoot
         _highCrosshair.position = _topTouchAreaBeginPoint;
     }
 
-
+    //method which allows subchar scripts to add themselves to the character list during runtime
     protected void SendToCharList(ICharacter character)
     {
         if (PlayerHead.Characters.Contains(character)) return;
@@ -108,6 +108,7 @@ public class PlayerMove : PlayerShoot
         //jumping and gravity (prototype only)
         if (Jump.WasPressedThisFrame() && _currCoyoteTime > 0)
         {
+            //invoke unity event which is wired to the player's animator
             JumpPressed.Invoke();
 
             _verticalVel = Mathf.Sqrt(_jumpHeight * -2f * Physics.gravity.y);

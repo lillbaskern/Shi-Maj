@@ -91,11 +91,9 @@ public class Weapon
         RaycastHit hit;
         if (Physics.Raycast(shootPoint, player.TransformDirection(Vector3.forward), out hit, Range))
         {
-            if (hit.transform.TryGetComponent<EnemyHead>(out EnemyHead enemy))
+            if (hit.transform.TryGetComponent<IShootable>(out IShootable hitTarget))
             {
-                //Whenever it says "HP = damage" or something of the like, where HP and damage are both ints, it means that the HP will subtract damage from itself
-                //this is because HP is a property and its setter runs a method named takedamage which simply subtracts the int damage from a private hp variable
-                enemy.HP = Damage;
+                hitTarget.Hit(Damage);
             }
         }
         yield return _fireRate;
@@ -213,10 +211,12 @@ public class PlayerShoot : MonoBehaviour
             _lowCrosshair.gameObject.SetActive(false);
             return;
         }
-        //if (_highCrosshair == null) return;
-        RaycastHit hit;
+
+
         //to make the raycast work even if you are unarmed, we use the ternary operator to set a new floats value based on whether or not you have a weapon
         float range = CurrWeapon == null ? 30f : CurrWeapon.Range;
+
+        RaycastHit hit;
         if (Physics.Raycast(_lowShootPoint.position, transform.TransformDirection(Vector3.forward), out hit, range))
         {
             _lowCrosshair.position = hit.point;
@@ -253,7 +253,7 @@ public class PlayerShoot : MonoBehaviour
             if(_cc.velocity.y >= 0.1f || _cc.velocity.y <= -0.1f) return;
             if (CurrWeapon == null) return;
             if (CurrWeapon.IsReloading) return;
-            StartCoroutine(CurrWeapon.Fire(this.transform, 10f, _highShootPoint.position, _audioSource));
+            StartCoroutine(CurrWeapon.Fire(this.transform, 10f, _lowShootPoint.position, _audioSource));
             WeaponUIEventArgs args = new(CurrWeapon);
             args.IsSimple = true;
             WeaponUIChange?.Invoke(this, args);
