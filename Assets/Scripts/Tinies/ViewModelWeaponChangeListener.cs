@@ -8,8 +8,10 @@ public class ViewModelWeaponChangeListener : MonoBehaviour
     [SerializeField]GameObject pistol;
     IEnumerator Start()
     {
-        yield return new WaitForSeconds(0.11f);
+        yield return new WaitForSeconds(0.13f);//i will learn the execution order next week, sorry.
         foreach (PlayerShoot shoot in CurrentWeaponTextListener.Shoots) shoot.WeaponUIChange += OnUIChange;
+        unarmed = GameObject.Find("UnarmedViewmodel");
+        pistol = GameObject.Find("GunViewmodel");
     }
 
     //this shit is horrible

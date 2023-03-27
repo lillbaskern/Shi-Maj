@@ -301,7 +301,7 @@ public class PlayerShoot : MonoBehaviour
                 CurrWeapon = _weapons[i];
                 _audioSource.clip = CurrWeapon?.ShootSound;
                 WeaponUIEventArgs args = new(weaponToPickup);
-                WeaponUIChange.Invoke(this, args);
+                WeaponUIChange?.Invoke(this, args);
                 return;
             }
         }

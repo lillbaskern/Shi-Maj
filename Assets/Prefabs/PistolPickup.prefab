@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1481329542599716539}
   - component: {fileID: 1481329542599716538}
   - component: {fileID: 1481329542599716537}
-  - component: {fileID: 1481329542599716536}
+  - component: {fileID: 1747966598467605886}
   m_Layer: 0
   m_Name: PistolPickup
   m_TagString: Untagged
@@ -99,7 +99,7 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
---- !u!114 &1481329542599716536
+--- !u!114 &1747966598467605886
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
