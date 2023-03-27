@@ -105,7 +105,7 @@ public class Weapon
     }
 }
 
-
+[DefaultExecutionOrder(-1)]
 public class PlayerShoot : MonoBehaviour
 {
     AudioSource _audioSource;

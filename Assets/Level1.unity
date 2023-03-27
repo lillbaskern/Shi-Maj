@@ -20951,6 +20951,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5848040892520199043, guid: ebc3ac21865122b468905d8cb5d4940f,
+        type: 3}
+      propertyPath: m_Name
+      value: GunViewModel
+      objectReference: {fileID: 0}
     - target: {fileID: 5848040893220252363, guid: ebc3ac21865122b468905d8cb5d4940f,
         type: 3}
       propertyPath: m_Name

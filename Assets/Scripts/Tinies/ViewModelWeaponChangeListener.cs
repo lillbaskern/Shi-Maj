@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
 public class ViewModelWeaponChangeListener : MonoBehaviour
 {
     [SerializeField]GameObject unarmed;
@@ -12,11 +11,12 @@ public class ViewModelWeaponChangeListener : MonoBehaviour
         foreach (PlayerShoot shoot in CurrentWeaponTextListener.Shoots) shoot.WeaponUIChange += OnUIChange;
         unarmed = GameObject.Find("UnarmedViewmodel");
         pistol = GameObject.Find("GunViewmodel");
+        pistol.SetActive(false);
     }
 
     void OnUIChange(object sender, WeaponUIEventArgs args)
     {
-        Debug.Log(args);
+        Debug.Log(args.WeaponName);
         if (args.WeaponName == "Pistol")
         {
             unarmed.SetActive(false);
