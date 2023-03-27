@@ -8,15 +8,15 @@ public class ViewModelWeaponChangeListener : MonoBehaviour
     [SerializeField]GameObject pistol;
     IEnumerator Start()
     {
-        yield return new WaitForSeconds(0.13f);//i will learn the execution order next week, sorry.
+        yield return new WaitForSeconds(0.13f);//i will learn the execution order next week, this habit is too large to unferl at the moment.
         foreach (PlayerShoot shoot in CurrentWeaponTextListener.Shoots) shoot.WeaponUIChange += OnUIChange;
         unarmed = GameObject.Find("UnarmedViewmodel");
         pistol = GameObject.Find("GunViewmodel");
     }
 
-    //this shit is horrible
     void OnUIChange(object sender, WeaponUIEventArgs args)
     {
+        Debug.Log(args);
         if (args.WeaponName == "Pistol")
         {
             unarmed.SetActive(false);
