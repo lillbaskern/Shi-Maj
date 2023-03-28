@@ -9,15 +9,13 @@ using System;
 //for the sake of this assignment, it also handles characters and character switching
 public class PlayerHead : MonoBehaviour
 {
-    public static event EventHandler<CharChangeEventArgs> TextChanged; //handling events in such disorganized ways could be very dangerous
+    public static event EventHandler<CharChangeEventArgs> TextChanged; //handling events in such a disorganized way as this is a hassle
     public static Action UpdateWeaponNameUIUnarmed;
 
     //the viewmodel's camera's GameObject
     GameObject _uiCamera;
 
     InputHandler _input;
-
-
     PlayerShoot _shooter;
 
     public static List<ICharacter> Characters = new();
@@ -27,10 +25,11 @@ public class PlayerHead : MonoBehaviour
     {
         get { return _currChar; }
     }
-
     private int _currCharIndex = 0;
-    [SerializeField] private int hp;
+
+
     private bool hasInit;
+    [SerializeField] private int hp;
     public int HP
     {
         get
@@ -43,6 +42,7 @@ public class PlayerHead : MonoBehaviour
         }
     }
 
+    public bool FreezePlayer = true;
 
     IEnumerator Start()
     {
@@ -52,7 +52,7 @@ public class PlayerHead : MonoBehaviour
         yield return new WaitForEndOfFrame();
 
         _currChar = Characters[_currCharIndex];
-        
+
 
         //invoke event
         CharChangeEventArgs args = new(_currChar.GetName());
@@ -76,6 +76,9 @@ public class PlayerHead : MonoBehaviour
     void Update()
     {
         if (!hasInit) return;
+        if (FreezePlayer) return;
+
+        //code for switching between chars below [DEPRECATED]
 
         if (_input.NextChar.WasPressedThisFrame())
         {
@@ -129,6 +132,11 @@ public class PlayerHead : MonoBehaviour
     {
         hp -= incomingDamage;
         Debug.Log(hp);
+    }
+
+    public void FreezeUnFreeze()
+    {
+        FreezePlayer = !FreezePlayer;
     }
 }
 
