@@ -137,18 +137,28 @@ public class PlayerShoot : MonoBehaviour
     {
         _audioSource = GetComponent<AudioSource>();
         _input = GetComponent<InputHandler>();
+
+        //Find is not something you should necessary be using, but as i see it the onus is on the lead programmer
         _lowShootPoint = GameObject.Find("LowShootOrigin").transform;
         _highShootPoint = GameObject.Find("HighShootOrigin").transform;
         _highCrosshair = GameObject.Find("HighCrosshairDecal").transform;
         _lowCrosshair = GameObject.Find("LowCrosshairDecal").transform;
+
         CurrentWeaponTextListener.Shoots.Add(this);
 
         if (_highShootPoint == null || _lowShootPoint == null)
         {
+
+
+
             Debug.LogWarning("NOT ENOUGH SHOOTPOINTS ATTACHED, PLEASE ENSURE THAT YOU HAVE INHABITED LOWSHOOTPOINT AND HIGHSHOOTPOINT WITH ANY TRANSFORM(S)");
             Debug.LogWarning("Player will now self destruct in 10...9...");
+
+
+
             this.gameObject.SetActive(false);
         }
+
         _uiLowCrosshair = GameObject.Find("LOWcrosshair").transform;
         _uiHighCrosshair = GameObject.Find("HIGHcrosshair");
 
@@ -158,11 +168,15 @@ public class PlayerShoot : MonoBehaviour
     protected void ShootUpdate()
     {
         if (!this.hasInit) return;
+
         //draw ray for debug purposes
         Debug.DrawRay(_lowShootPoint.position, _lowShootPoint.TransformDirection(Vector3.forward) * 100f, Color.blue);
         Debug.DrawRay(_highShootPoint.position, _highShootPoint.TransformDirection(Vector3.forward) * 100f, Color.green);
+
+
         ProjectHighCrossHair();
         ProjectLowCrossHair();
+        
         PollForInput();
 
         //handle things that are weapon-related after this guard clause
@@ -238,7 +252,7 @@ public class PlayerShoot : MonoBehaviour
         if (_input.Special.WasPressedThisFrame()) Special();
         if (_input.ShootHigh.WasPressedThisFrame())
         {
-            if(_cc.velocity.y >= 0.1f || _cc.velocity.y <= -0.1f) return;
+            if (_cc.velocity.y >= 0.1f || _cc.velocity.y <= -0.1f) return;
             if (CurrWeapon == null) return;
             if (CurrWeapon.IsReloading) return;
             StartCoroutine(CurrWeapon.Fire(this.transform, 10f, _highShootPoint.position, _audioSource));
@@ -250,7 +264,7 @@ public class PlayerShoot : MonoBehaviour
         }
         if (_input.ShootLow.WasPressedThisFrame())
         {
-            if(_cc.velocity.y >= 0.1f || _cc.velocity.y <= -0.1f) return;
+            if (_cc.velocity.y >= 0.1f || _cc.velocity.y <= -0.1f) return;
             if (CurrWeapon == null) return;
             if (CurrWeapon.IsReloading) return;
             StartCoroutine(CurrWeapon.Fire(this.transform, 10f, _lowShootPoint.position, _audioSource));
@@ -260,12 +274,14 @@ public class PlayerShoot : MonoBehaviour
         }
         if (_input.NextWeapon.WasPressedThisFrame())
         {
+
             if (_currWeaponIndex >= _weapons.Length - 1) return;
             //Make sure the player can only access one "unarmed" weapon slot at a time
             if (CurrWeapon == null && _weapons[_currWeaponIndex + 1] == null) return;
 
             WeaponUIEventArgs args = new(_weapons[++_currWeaponIndex]);
             WeaponUIChange?.Invoke(this, args);
+
             CurrWeapon = _weapons[_currWeaponIndex];
             //set audio clip to current weapons shootsound
             _audioSource.clip = CurrWeapon?.ShootSound;
@@ -287,22 +303,41 @@ public class PlayerShoot : MonoBehaviour
     }
     public void PickUpWeapon(Weapon weaponToPickup)
     {
+
+        UITextPromptArgs promptArgs = new($"Picking up {weaponToPickup.WeaponName}");
+        UITextPromptObserver.SendUITextPrompt(this, promptArgs);
+
+
+        //first, loop through each weapon with each weapon and see if any weapon is identical to the one being picked up
         for (int i = 0; i < _weapons.Length - 1; i++)
         {
-            if (weaponToPickup == _weapons[i])
+            for (int j = 0; j < _weapons.Length - 1; j++)
             {
-                //weapons have a special setter for ammostock which makes sure they stay within the limits of their max ammo capacity
-                CurrWeapon.AmmoStock = _weapons[i].AmmoStock;
-                return;
+                if (_weapons[i] != null && _weapons[i] == _weapons[j])
+                {
+                    _weapons[i].AmmoStock += weaponToPickup.AmmoStock;
+
+                    WeaponUIEventArgs args = new(_weapons[i]);
+                    args.IsSimple = true;
+                    WeaponUIChange?.Invoke(this,args);
+
+                    return;
+                }
             }
+        }
+
+        for (int i = 0; i < _weapons.Length - 1; i++)
+        {
             if (_weapons[i] == null)
             {
                 _weapons[i] = weaponToPickup;
                 CurrWeapon = _weapons[i];
                 _audioSource.clip = CurrWeapon?.ShootSound;
-                WeaponUIEventArgs args = new(weaponToPickup);
-                WeaponUIChange?.Invoke(this, args);
-                return;
+
+                //invoke weapon ui event
+                WeaponUIEventArgs weaponUIArgs = new(weaponToPickup);
+                WeaponUIChange?.Invoke(this, weaponUIArgs);
+                return;//not necessary but its my little baby
             }
         }
     }

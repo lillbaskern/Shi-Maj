@@ -46,11 +46,13 @@ public class PlayerHead : MonoBehaviour
 
     IEnumerator Start()
     {
+
         CurrentWeaponTextListener.PlayerHead = this;
         //let character scripts do their thing
         yield return new WaitForEndOfFrame();
 
         _currChar = Characters[_currCharIndex];
+        
 
         //invoke event
         CharChangeEventArgs args = new(_currChar.GetName());
@@ -144,6 +146,12 @@ public class WeaponUIEventArgs : EventArgs
         WeaponName = weapon.WeaponName;
         currMag = weapon.CurrMag;
         AmmoCache = weapon.AmmoStock;
+    }
+
+    public WeaponUIEventArgs()
+    {
+        WeaponName = "Unarmed";
+        AmmoCache = -1;
     }
     public bool IsSimple;
     public string WeaponName;
