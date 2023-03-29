@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ProjectileBehaviour : MonoBehaviour
 {
-
+    public int Damage = 13;
     public Transform Target = null;
     public float MoveSpeed;
     public void InitProj(Transform target)
@@ -23,6 +23,7 @@ public class ProjectileBehaviour : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             //make player take damage, play sound, change ui. whatever
+            other.GetComponent<PlayerHead>().HP = Damage;
             Destroy(this.gameObject);
         }
         else

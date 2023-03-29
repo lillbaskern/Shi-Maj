@@ -1,16 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+using TMPro;
 using System;
 
 ///////<SUMMARY>///////
 //PlayerHead contains important data about the players current state,
 //-so that other scripts can quickly make changes to the player's HP/other stats. 
-//for the sake of this assignment, it also handles characters and character switching
+//for the sake of the assignment for the course game programming in unity
+//it also handles characters and character switching
 public class PlayerHead : MonoBehaviour
 {
-    public static event EventHandler<CharChangeEventArgs> TextChanged; //handling events in such a disorganized way as this is a hassle
+    public static event EventHandler<CharChangeEventArgs> TextChanged; //handling events in such a disorganized way like this is a slight hassle
     public static Action UpdateWeaponNameUIUnarmed;
+
+    TextMeshProUGUI _hpDisplay;
+
+    //unity event so i can quickly trigger the death state with minimal coding
+    public UnityEvent OnDeath;
 
     //the viewmodel's camera's GameObject
     GameObject _uiCamera;
@@ -29,7 +37,10 @@ public class PlayerHead : MonoBehaviour
 
 
     private bool hasInit;
+
+    //neat way of using properties yet still having inspector editable variables below
     [SerializeField] private int hp;
+    
     public int HP
     {
         get
@@ -52,8 +63,9 @@ public class PlayerHead : MonoBehaviour
         yield return new WaitForEndOfFrame();
 
         _currChar = Characters[_currCharIndex];
-
-
+        
+        _hpDisplay = GameObject.Find("HP Display").GetComponent<TextMeshProUGUI>();
+        
         //invoke event
         CharChangeEventArgs args = new(_currChar.GetName());
         TextChanged?.Invoke(this, args);
@@ -79,7 +91,6 @@ public class PlayerHead : MonoBehaviour
         if (FreezePlayer) return;
 
         //code for switching between chars below [DEPRECATED]
-
         if (_input.NextChar.WasPressedThisFrame())
         {
             _currCharIndex++;
@@ -130,8 +141,14 @@ public class PlayerHead : MonoBehaviour
 
     void TakeDamage(int incomingDamage)
     {
+        if(hp <=0) return; //sanity check
+
         hp -= incomingDamage;
-        Debug.Log(hp);
+        
+        //TODO: update HP display
+        _hpDisplay.text = $"HP: {hp}";
+
+        if(hp <= 0) OnDeath?.Invoke();
     }
 
     public void FreezeUnFreeze()
@@ -161,6 +178,7 @@ public class WeaponUIEventArgs : EventArgs
         WeaponName = "Unarmed";
         AmmoCache = -1;
     }
+
     public bool IsSimple;
     public string WeaponName;
     public int currMag;
