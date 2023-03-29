@@ -10,12 +10,13 @@ public interface IShootable
 
 public class PuzzleManager : MonoBehaviour
 {
-    public static List<PuzzlePiece> PuzzlePieces = new();
+    public static List<PuzzlePiece> PuzzlePieces;
 
     public static Animator DoorAnimator;
 
     private void Start()
     {
+        PuzzlePieces = new();
         DoorAnimator = GameObject.Find("Door").GetComponent<Animator>();
         CheckPuzzleState();
     }

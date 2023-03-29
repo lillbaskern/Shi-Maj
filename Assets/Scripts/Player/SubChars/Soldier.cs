@@ -11,6 +11,10 @@ public class Soldier : PlayerMove, ICharacter
     {
         SendToCharList(this);
     }
+    private void Start()
+    {
+        SendToCharList(this);
+    }
     public void CharacterInit()
     {
         base.InitShoot();

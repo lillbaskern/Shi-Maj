@@ -7,10 +7,13 @@ public class ProjectileBehaviour : MonoBehaviour
     public int Damage = 13;
     public Transform Target = null;
     public float MoveSpeed;
+    
+    //initproj is called from whichever enemy fired the projectile immediately after instantiation
     public void InitProj(Transform target)
     {
         Target = target;
         transform.LookAt(Target);
+        Destroy(this.gameObject,5f);
     }
 
     void FixedUpdate()
@@ -22,13 +25,8 @@ public class ProjectileBehaviour : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            //make player take damage, play sound, change ui. whatever
             other.GetComponent<PlayerHead>().HP = Damage;
-            Destroy(this.gameObject);
         }
-        else
-        {
-            Destroy(this.gameObject);
-        }
+        Destroy(this.gameObject);
     }
 }

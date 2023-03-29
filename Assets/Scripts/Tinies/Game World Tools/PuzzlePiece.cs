@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+[DefaultExecutionOrder(1)]
 public class PuzzlePiece : MonoBehaviour, IShootable
 {
     public UnityEvent PuzzleDone;

@@ -49,13 +49,13 @@ public class UITextPromptListener : MonoBehaviour
         _textField.text = inputText;
         //while text is not opaque, increase opacity
         //(this one could be hard because colours are not just numbers as far as coding is concerned)
-        
+
         _textField.CrossFadeAlpha(1, 0.1f, true);
 
         yield return new WaitForSeconds(duration);
 
         _textField.CrossFadeAlpha(0, 0.5f, true);
-        
+
         yield return null;
     }
 
@@ -63,5 +63,9 @@ public class UITextPromptListener : MonoBehaviour
     {
         StopAllCoroutines();
         _textField.alpha = 0f;
+    }
+    private void OnDisable()
+    {
+        UITextPromptObserver.UITextPrompt -= OnUITextPrompt;
     }
 }

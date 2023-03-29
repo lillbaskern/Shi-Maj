@@ -149,14 +149,15 @@ public class PlayerShoot : MonoBehaviour
         if (_highShootPoint == null || _lowShootPoint == null)
         {
 
-
+            _lowShootPoint = GameObject.Find("LowShootOrigin").transform;
+            _highShootPoint = GameObject.Find("HighShootOrigin").transform;
 
             Debug.LogWarning("NOT ENOUGH SHOOTPOINTS ATTACHED, PLEASE ENSURE THAT YOU HAVE INHABITED LOWSHOOTPOINT AND HIGHSHOOTPOINT WITH ANY TRANSFORM(S)");
             Debug.LogWarning("Player will now self destruct in 10...9...");
 
 
 
-            this.gameObject.SetActive(false);
+            // this.gameObject.SetActive(false);
         }
 
         _uiLowCrosshair = GameObject.Find("LOWcrosshair").transform;

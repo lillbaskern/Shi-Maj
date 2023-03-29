@@ -10,6 +10,7 @@ using System;
 //-so that other scripts can quickly make changes to the player's HP/other stats. 
 //for the sake of the assignment for the course game programming in unity
 //it also handles characters and character switching
+[DefaultExecutionOrder(-2)]
 public class PlayerHead : MonoBehaviour
 {
     public static event EventHandler<CharChangeEventArgs> TextChanged; //handling events in such a disorganized way like this is a slight hassle
@@ -26,7 +27,7 @@ public class PlayerHead : MonoBehaviour
     InputHandler _input;
     PlayerShoot _shooter;
 
-    public static List<ICharacter> Characters = new();
+    public static List<ICharacter> Characters;
     ICharacter _currChar;
 
     public ICharacter CurrentCharacter
@@ -57,7 +58,8 @@ public class PlayerHead : MonoBehaviour
 
     IEnumerator Start()
     {
-
+        Characters = new();
+        FreezePlayer = true;
         CurrentWeaponTextListener.PlayerHead = this;
         //let character scripts do their thing
         yield return new WaitForEndOfFrame();
