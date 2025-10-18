@@ -109,10 +109,10 @@ public class PlayerMove : PlayerShoot
 
             _currCoyoteTime = 0;
         }
+        else _verticalVel += Physics.gravity.y *_fallSpeed * Time.deltaTime;
 
         //gravity
         //you can further dissolve Physics.gravity.y into float _MaxFallSpeed 
-        _verticalVel += Physics.gravity.y * Time.deltaTime;
         _verticalVel = Mathf.Clamp(_verticalVel, Physics.gravity.y, 50f);
 
 

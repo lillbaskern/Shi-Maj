@@ -77,7 +77,7 @@ public class Weapon
         WeaponUIEventArgs args = new(this);
         AmmoUpdate?.Invoke(this, args);
     }
-    public virtual IEnumerator Fire(Transform player, Transform cameraTransform, float radius, AudioSource source)
+    public virtual IEnumerator Fire(Transform cameraTransform, float radius, AudioSource source)
     {
         if (CurrMag <= 0 || IsReloading) yield break;
         if (!_isReadyToFire) yield break;
@@ -89,7 +89,7 @@ public class Weapon
         AmmoUpdate?.Invoke(this, args);
 
         RaycastHit hit;
-        if (Physics.Raycast(player.position + new Vector3(0f,1f,0f), cameraTransform.TransformDirection(Vector3.forward), out hit, Range))
+        if (Physics.Raycast(cameraTransform.position, cameraTransform.TransformDirection(Vector3.forward), out hit, Range))
         {
             Debug.Log(hit.point);
             if (hit.transform.TryGetComponent<IShootable>(out IShootable hitTarget))
@@ -172,7 +172,7 @@ public class PlayerShoot : MonoBehaviour
         {
             if (CurrWeapon == null) return;
             if (CurrWeapon.IsReloading) return;
-            StartCoroutine(CurrWeapon.Fire(this.transform, _cameraTransform, 10f, _audioSource));
+            StartCoroutine(CurrWeapon.Fire(_cameraTransform, 10f, _audioSource));
             WeaponUIEventArgs args = new(CurrWeapon);
             args.IsSimple = true;
             WeaponUIChange?.Invoke(this, args);

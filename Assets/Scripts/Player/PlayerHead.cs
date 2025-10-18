@@ -7,9 +7,7 @@ using System;
 
 ///////<SUMMARY>///////
 //PlayerHead contains important data about the players current state,
-//-so that other scripts can quickly make changes to the player's HP/other stats. 
-//for the sake of the assignment for the course game programming in unity
-//it also handles characters and character switching
+//-so that other scripts can quickly make changes to the player's HP and character data
 [DefaultExecutionOrder(-2)]
 public class PlayerHead : MonoBehaviour
 {
@@ -30,10 +28,18 @@ public class PlayerHead : MonoBehaviour
     public static List<ICharacter> Characters;
     ICharacter _currChar;
 
+    public float XP { get; private set; }
+    public float Gold { get; private set; }
+    float _gold = 0;
+
+
+
     public ICharacter CurrentCharacter
     {
         get { return _currChar; }
     }
+
+
     private int _currCharIndex = 0;
 
 
@@ -88,6 +94,12 @@ public class PlayerHead : MonoBehaviour
             character.CharacterInit();
         }
     }
+
+    public void AddXP(int xp) 
+    {
+        _currChar.AddXP(xp);
+    }
+
     void Update()
     {
         if (!hasInit) return;

@@ -7,10 +7,6 @@ public class Soldier : PlayerMove, ICharacter
     public string GetName() => _name;
     public Weapon GetCurrWeapon() => CurrWeapon;
 
-    private void OnEnable()
-    {
-        SendToCharList(this);
-    }
     private void Start()
     {
         SendToCharList(this);
@@ -29,5 +25,23 @@ public class Soldier : PlayerMove, ICharacter
         Debug.Log("soldier special used");
     }
 
+    public int GetLevel()
+    {
+        throw new System.NotImplementedException();
+    }
 
+    public float GetXP()
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void AddXP(float xp)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void LevelUp()
+    {
+        throw new System.NotImplementedException();
+    }
 }
