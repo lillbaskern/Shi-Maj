@@ -335,12 +335,12 @@ PrefabInstance:
     - target: {fileID: 352317352074146802, guid: 824df92b74bc3a34abd7e46cf54e9d57,
         type: 3}
       propertyPath: m_Name
-      value: GunViewModelSprite
+      value: GunViewModel
       objectReference: {fileID: 0}
     - target: {fileID: 352317352074146802, guid: 824df92b74bc3a34abd7e46cf54e9d57,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 352317352074146813, guid: 824df92b74bc3a34abd7e46cf54e9d57,
         type: 3}

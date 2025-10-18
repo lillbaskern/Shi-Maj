@@ -77,7 +77,7 @@ public class Weapon
         WeaponUIEventArgs args = new(this);
         AmmoUpdate?.Invoke(this, args);
     }
-    public virtual IEnumerator Fire(Transform player, float radius, Vector3 shootPoint, AudioSource source)
+    public virtual IEnumerator Fire(Transform player, Transform cameraTransform, float radius, AudioSource source)
     {
         if (CurrMag <= 0 || IsReloading) yield break;
         if (!_isReadyToFire) yield break;
@@ -89,8 +89,9 @@ public class Weapon
         AmmoUpdate?.Invoke(this, args);
 
         RaycastHit hit;
-        if (Physics.Raycast(shootPoint, player.TransformDirection(Vector3.forward), out hit, Range))
+        if (Physics.Raycast(player.position + new Vector3(0f,1f,0f), cameraTransform.TransformDirection(Vector3.forward), out hit, Range))
         {
+            Debug.Log(hit.point);
             if (hit.transform.TryGetComponent<IShootable>(out IShootable hitTarget))
             {
                 hitTarget.Hit(Damage);
@@ -128,6 +129,8 @@ public class PlayerShoot : MonoBehaviour
     [SerializeField] static Transform _lowShootPoint;
     [SerializeField] static Transform _highShootPoint;
 
+    protected Transform _cameraTransform;
+
 
     bool hasInit = false;
 
@@ -137,31 +140,10 @@ public class PlayerShoot : MonoBehaviour
     {
         _audioSource = GetComponent<AudioSource>();
         _input = GetComponent<InputHandler>();
+        _cameraTransform = Camera.main.transform;
 
-        //Find is not something you should necessary be using, but as i see it the onus is on the lead programmer
-        _lowShootPoint = GameObject.Find("LowShootOrigin").transform;
-        _highShootPoint = GameObject.Find("HighShootOrigin").transform;
-        _highCrosshair = GameObject.Find("HighCrosshairDecal").transform;
-        _lowCrosshair = GameObject.Find("LowCrosshairDecal").transform;
 
         CurrentWeaponTextListener.Shoots.Add(this);
-
-        if (_highShootPoint == null || _lowShootPoint == null)
-        {
-
-            _lowShootPoint = GameObject.Find("LowShootOrigin").transform;
-            _highShootPoint = GameObject.Find("HighShootOrigin").transform;
-
-            Debug.LogWarning("NOT ENOUGH SHOOTPOINTS ATTACHED, PLEASE ENSURE THAT YOU HAVE INHABITED LOWSHOOTPOINT AND HIGHSHOOTPOINT WITH ANY TRANSFORM(S)");
-            Debug.LogWarning("Player will now self destruct in 10...9...");
-
-
-
-            // this.gameObject.SetActive(false);
-        }
-
-        _uiLowCrosshair = GameObject.Find("LOWcrosshair").transform;
-        _uiHighCrosshair = GameObject.Find("HIGHcrosshair");
 
         this.hasInit = true;
     }
@@ -170,13 +152,6 @@ public class PlayerShoot : MonoBehaviour
     {
         if (!this.hasInit) return;
 
-        //draw ray for debug purposes
-        Debug.DrawRay(_lowShootPoint.position, _lowShootPoint.TransformDirection(Vector3.forward) * 100f, Color.blue);
-        Debug.DrawRay(_highShootPoint.position, _highShootPoint.TransformDirection(Vector3.forward) * 100f, Color.green);
-
-
-        ProjectHighCrossHair();
-        ProjectLowCrossHair();
         
         PollForInput();
 
@@ -185,64 +160,6 @@ public class PlayerShoot : MonoBehaviour
         if (CurrWeapon.CurrMag <= 0) StartCoroutine(CurrWeapon.Reload());
     }
 
-
-    protected virtual void ProjectHighCrossHair()
-    {
-
-        if (_cc.velocity.y >= 0.1f || _cc.velocity.y <= -0.1f)
-        {
-            _uiHighCrosshair.SetActive(false);
-            _highCrosshair.gameObject.SetActive(false);
-            return;
-        }
-
-        //if (_highCrosshair == null) return;
-        RaycastHit hit;
-        //to make the raycast work even if you are unarmed, we use the ternary operator to set a new floats value based on whether or not you have a weapon
-        float range = CurrWeapon == null ? 30f : CurrWeapon.Range;
-        if (Physics.Raycast(_highShootPoint.position, transform.TransformDirection(Vector3.forward), out hit, range))
-        {
-            if (hit.distance < 4.57f) //4.57f is how close the enemy is when the crosshair starts go off-screen
-            {
-                //AS THE CONCEPT GOES, YOUR CHARACTER WILL THROW A GRENADE IF THE ENEMY IS TOO CLOSE FOR THE UPPER CROSSHAIR DECAL TO DISPLAY ON SCREEN
-                //HERE WE ONLY PROJECT THE CROSSHAIR THOUGH, SO ONLY AN INDICATOR THAT THE GRENADE THROW WILL HAPPEN IS NEEDED HERE
-                //MAYBE CHANGE THE CROSSHAIR TO RED?
-                //OTHERWISE, RED CHEVRONS WHICH POINT UPWARD (MAYBE WITH A GRENADE ICON AS WELL?)
-            }
-            _highCrosshair.position = hit.point;
-            _highCrosshair.rotation = this.transform.rotation;
-            _highCrosshair.gameObject.SetActive(true);
-            _uiHighCrosshair.SetActive(false);
-            return;
-        }
-        _highCrosshair.gameObject.SetActive(false);
-        _uiHighCrosshair.SetActive(true);
-    }
-    protected virtual void ProjectLowCrossHair()
-    {
-        if (_cc.velocity.y >= 0.1f || _cc.velocity.y <= -0.1f)
-        {
-            _uiLowCrosshair.gameObject.SetActive(false);
-            _lowCrosshair.gameObject.SetActive(false);
-            return;
-        }
-
-
-        //to make the raycast work even if you are unarmed, we use the ternary operator to set a new floats value based on whether or not you have a weapon
-        float range = CurrWeapon == null ? 30f : CurrWeapon.Range;
-
-        RaycastHit hit;
-        if (Physics.Raycast(_lowShootPoint.position, transform.TransformDirection(Vector3.forward), out hit, range))
-        {
-            _lowCrosshair.position = hit.point;
-            _lowCrosshair.rotation = this.transform.rotation;
-            _lowCrosshair.gameObject.SetActive(true);
-            _uiLowCrosshair.gameObject.SetActive(false);
-            return;
-        }
-        _lowCrosshair.gameObject.SetActive(false);
-        _uiLowCrosshair.gameObject.SetActive(true);
-    }
 
     public virtual void Special()
     {
@@ -253,29 +170,17 @@ public class PlayerShoot : MonoBehaviour
         if (_input.Special.WasPressedThisFrame()) Special();
         if (_input.ShootHigh.WasPressedThisFrame())
         {
-            if (_cc.velocity.y >= 0.1f || _cc.velocity.y <= -0.1f) return;
             if (CurrWeapon == null) return;
             if (CurrWeapon.IsReloading) return;
-            StartCoroutine(CurrWeapon.Fire(this.transform, 10f, _highShootPoint.position, _audioSource));
+            StartCoroutine(CurrWeapon.Fire(this.transform, _cameraTransform, 10f, _audioSource));
             WeaponUIEventArgs args = new(CurrWeapon);
             args.IsSimple = true;
             WeaponUIChange?.Invoke(this, args);
-            //im hoping this return only keeps the player from shooting both high and low on the same frame
             return;
-        }
-        if (_input.ShootLow.WasPressedThisFrame())
-        {
-            if (_cc.velocity.y >= 0.1f || _cc.velocity.y <= -0.1f) return;
-            if (CurrWeapon == null) return;
-            if (CurrWeapon.IsReloading) return;
-            StartCoroutine(CurrWeapon.Fire(this.transform, 10f, _lowShootPoint.position, _audioSource));
-            WeaponUIEventArgs args = new(CurrWeapon);
-            args.IsSimple = true;
-            WeaponUIChange?.Invoke(this, args);
         }
         if (_input.NextWeapon.WasPressedThisFrame())
         {
-
+            //todo:: maybe make weapon swapping loop from top of list to bottom and vice versa
             if (_currWeaponIndex >= _weapons.Length - 1) return;
             //Make sure the player can only access one "unarmed" weapon slot at a time
             if (CurrWeapon == null && _weapons[_currWeaponIndex + 1] == null) return;

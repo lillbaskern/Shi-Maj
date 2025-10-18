@@ -20162,12 +20162,12 @@ RectTransform:
   - {fileID: 2055960993}
   - {fileID: 1466291872}
   m_Father: {fileID: 934643902}
-  m_RootOrder: 11
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 26.52}
-  m_SizeDelta: {x: 828, y: 1007}
+  m_SizeDelta: {x: 828, y: 602.69}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1010249164
 MonoBehaviour:
@@ -21546,12 +21546,12 @@ RectTransform:
   - {fileID: 421353836}
   - {fileID: 677964938}
   m_Father: {fileID: 934643902}
-  m_RootOrder: 12
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 26.52}
-  m_SizeDelta: {x: 828, y: 1007}
+  m_SizeDelta: {x: 828, y: 602.69}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1159751470
 MonoBehaviour:
@@ -21876,12 +21876,12 @@ RectTransform:
   - {fileID: 1324871297}
   - {fileID: 1105482379}
   m_Father: {fileID: 934643902}
-  m_RootOrder: 10
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 26.52}
-  m_SizeDelta: {x: 828, y: 1007}
+  m_SizeDelta: {x: 828, y: 602.69}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1344932411
 MonoBehaviour:
@@ -22399,18 +22399,6 @@ MonoBehaviour:
       - m_Target: {fileID: 1466291876}
         m_TargetAssemblyTypeName: ExitToMenuButton, Assembly-CSharp
         m_MethodName: GoToMenu
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1896637843}
-        m_TargetAssemblyTypeName: PlayerHead, Assembly-CSharp
-        m_MethodName: FreezeUnFreeze
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -24974,7 +24962,7 @@ PrefabInstance:
     - target: {fileID: 7863603916103383573, guid: 80e03735b795f894995d592787f7cb4a,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -0.000030517578
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7863603916103383573, guid: 80e03735b795f894995d592787f7cb4a,
         type: 3}

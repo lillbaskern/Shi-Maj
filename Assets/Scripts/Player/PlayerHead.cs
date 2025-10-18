@@ -58,8 +58,9 @@ public class PlayerHead : MonoBehaviour
 
     IEnumerator Start()
     {
+        if (!FreezePlayer) Cursor.lockState = CursorLockMode.Locked;
+        else Cursor.lockState = CursorLockMode.None;
         Characters = new();
-        FreezePlayer = true;
         CurrentWeaponTextListener.PlayerHead = this;
         //let character scripts do their thing
         yield return new WaitForEndOfFrame();
@@ -156,6 +157,8 @@ public class PlayerHead : MonoBehaviour
     public void FreezeUnFreeze()
     {
         FreezePlayer = !FreezePlayer;
+        if (!FreezePlayer) Cursor.lockState = CursorLockMode.Locked;
+        else Cursor.lockState = CursorLockMode.None;
     }
 }
 

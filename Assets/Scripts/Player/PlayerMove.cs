@@ -45,10 +45,10 @@ public class PlayerMove : PlayerShoot
     [SerializeField] Vector2 _inputDir;
 
 
-    private Vector2 _turnDir;
-
-
+    Vector2 _turnDir;
     Vector3 _moveDir;
+    float _pitch = 0f; // how the camera will turn around its x axis
+
     private float _verticalVel;
     [SerializeField] float _baseCoyoteTime;
     private float _currCoyoteTime = 0;
@@ -58,18 +58,12 @@ public class PlayerMove : PlayerShoot
     public static Vector2 _topTouchAreaBeginPoint;
     Collider _bottomTouchArea;
 
-
-
     public bool IsGrounded { get; private set; }
 
 
     void Awake()
     {
         _cc = GetComponent<CharacterController>();
-        _topTouchAreaBeginPoint.y = Screen.height * 0.75f;
-        _topTouchAreaBeginPoint.x = Screen.width * 0.5f;
-        _highCrosshair = GameObject.Find("HighCrosshairDecal").transform;
-        _highCrosshair.position = _topTouchAreaBeginPoint;
     }
 
     //method which allows subchar scripts to add themselves to the character list during runtime
@@ -122,24 +116,32 @@ public class PlayerMove : PlayerShoot
         _verticalVel = Mathf.Clamp(_verticalVel, Physics.gravity.y, 50f);
 
 
+    
 
 
         //handle rotation
-        _cc.transform.Rotate(Vector3.up * _turnDir.x * (Time.deltaTime * _turnRate));
-
+        _cc.transform.Rotate(Vector3.up * _turnDir.x * LookSensitivity* Time.deltaTime);
+        _pitch -= _turnDir.y * LookSensitivity * Time.deltaTime;
+        _pitch = Mathf.Clamp(_pitch, -80f, 80f);
+        _cameraTransform.localRotation = Quaternion.Euler(_pitch, 0, 0);
+        
+        
         //handle move acceleration
 
         HandleMoveAndTurnAccel();
 
 
         //create final move vector
+        //todo:: calculate _movedir differently if currently in the air
         _moveDir = new Vector3(_inputDir.x * _moveSpeed, _verticalVel, _inputDir.y * _moveSpeed);
+
         _cc.Move(_cc.transform.rotation * _moveDir * Time.deltaTime);
     }
 
     private void HandleMoveAndTurnAccel()
     {
-        if (_inputDir.magnitude <= 0)
+        //todo:: make separate acceleration logic for air and ground
+        if (_inputDir.magnitude <= 0 && !IsGrounded)
         {
             _moveSpeed = Mathf.Max(_moveSpeed - _moveAccel * Time.deltaTime * 2f, _minSpeed);
         }
@@ -149,12 +151,12 @@ public class PlayerMove : PlayerShoot
 
 
         //handle turn acceleration
-        if (_turnDir.magnitude <= 0)
-        {
-            _turnRate = Mathf.Max(_turnRate - _turnAccel * Time.deltaTime * 2f, _minTurnRate);
-        }
+        //if (_turnDir.magnitude <= 0)
+        //{
+        //    _turnRate = Mathf.Max(_turnRate - _turnAccel * Time.deltaTime * 2f, _minTurnRate);
+        //}
 
-        else _turnRate = Mathf.Min(_turnRate + _turnAccel * Time.deltaTime, _maxTurnRate);
+        //else _turnRate = Mathf.Min(_turnRate + _turnAccel * Time.deltaTime, _maxTurnRate);
     }
 
     public static void ApplyDeadZone(ref float input)
