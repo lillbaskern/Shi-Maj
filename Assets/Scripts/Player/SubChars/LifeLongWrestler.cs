@@ -34,7 +34,7 @@ public class Stats
     public float ReloadSpeed;
     public float ProjectileSize = 1f;
     public int ProjectileQuantity = 1;
-
+    public int ExtraMagSize = 0;
 }
 
 public class LifeLongWrestler : PlayerMove, ICharacter

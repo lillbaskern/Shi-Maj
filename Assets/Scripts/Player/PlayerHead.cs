@@ -11,10 +11,15 @@ using System;
 [DefaultExecutionOrder(-2)]
 public class PlayerHead : MonoBehaviour
 {
+    public static PlayerHead Instance { get; private set; }
+
     public static event EventHandler<CharChangeEventArgs> TextChanged; //handling events in such a disorganized way like this is a slight hassle
     public static Action UpdateWeaponNameUIUnarmed;
 
+
+    //TODO:: HUD Manager/UI Manager
     TextMeshProUGUI _hpDisplay;
+    TextMeshProUGUI _goldDisplay;
 
     //unity event so i can quickly trigger the death state with minimal coding
     public UnityEvent OnDeath;
@@ -64,6 +69,15 @@ public class PlayerHead : MonoBehaviour
 
     IEnumerator Start()
     {
+        if(Instance != null && Instance != this)
+        {
+            Destroy(this);
+            yield break;
+        }
+
+        Instance = this;
+
+
         if (!FreezePlayer) Cursor.lockState = CursorLockMode.Locked;
         else Cursor.lockState = CursorLockMode.None;
         Characters = new();
@@ -74,6 +88,7 @@ public class PlayerHead : MonoBehaviour
         _currChar = Characters[_currCharIndex];
         
         _hpDisplay = GameObject.Find("HP Display").GetComponent<TextMeshProUGUI>();
+        _goldDisplay = GameObject.Find("Gold Display").GetComponent<TextMeshProUGUI>();
         
         //invoke event
         CharChangeEventArgs args = new(_currChar.GetName());
@@ -152,6 +167,17 @@ public class PlayerHead : MonoBehaviour
         }
 
         _currChar.CharacterLoop(_input);
+    }
+
+    public void AddGold(int incomingGold)
+    {
+        _gold += incomingGold;
+        _goldDisplay.text = $"Gold: {_gold}";
+    }
+    public void RemoveGold(int incomingGold) 
+    {
+        _gold -= incomingGold; 
+        _goldDisplay.text = $"Gold: {_gold}";
     }
 
     void TakeDamage(int incomingDamage)

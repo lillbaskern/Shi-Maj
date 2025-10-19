@@ -324,7 +324,7 @@ MonoBehaviour:
   _name: Soldier
   LookSensitivity: 6.12
   _jumpHeight: 3.14
-  _fallSpeed: 0.69
+  _fallSpeed: 1.2
   _moveSpeed: 8.12
   _maxSpeed: 5.8
   _minSpeed: 1
@@ -421,7 +421,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7197150f7c106dd4fbdf50a2f1a953ca, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  OnDeath:
+    m_PersistentCalls:
+      m_Calls: []
   hp: 4
+  FreezePlayer: 1
 --- !u!114 &8782240385829340459
 MonoBehaviour:
   m_ObjectHideFlags: 0

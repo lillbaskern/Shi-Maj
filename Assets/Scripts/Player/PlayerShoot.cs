@@ -64,7 +64,6 @@ public class Weapon
         //but if i add a reload button in the future itll be useful
         if (CurrMag == MagCapacity || IsReloading || AmmoStock <= 0) yield break;
 
-        Debug.Log("Reloading");
         IsReloading = true;
 
         //replenish ammo based on how much ammo we have left
@@ -89,12 +88,14 @@ public class Weapon
         AmmoUpdate?.Invoke(this, args);
 
         RaycastHit hit;
-        if (Physics.Raycast(cameraTransform.position, cameraTransform.TransformDirection(Vector3.forward), out hit, Range))
+        Ray ray = Camera.main.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2));
+        if (Physics.Raycast(ray, out hit, Range))
         {
-            Debug.Log(hit.point);
             if (hit.transform.TryGetComponent<IShootable>(out IShootable hitTarget))
             {
                 hitTarget.Hit(Damage);
+                //should refactor to remove this singleton reference
+                PlayerHead.Instance.AddGold(10);
             }
         }
         yield return _fireRate;

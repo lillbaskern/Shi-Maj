@@ -1,13 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+[DefaultExecutionOrder(-100)]
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
     public Transform PlayerTransform;
     public float GameStartTime;
+
+    public List<IEnemy> Enemies;
 
     void Start()
     {
@@ -17,12 +19,19 @@ public class GameManager : MonoBehaviour
             return;
         }
         Instance = this;
-
-            GameStartTime = Time.realtimeSinceStartup;
         PlayerTransform = GameObject.Find("Player").transform;
+
+        Enemies = new List<IEnemy>();
+
+        GameStartTime = Time.realtimeSinceStartup;
     }
 
-
-
-
+    private void FixedUpdate()
+    {
+        if(Enemies == null || Enemies.Count == 0) { return; }
+        for(int i = 0; i < Enemies.Count; i++)
+        {
+            Enemies[i].EnemyFixedUpdate();
+        }
+    }
 }
