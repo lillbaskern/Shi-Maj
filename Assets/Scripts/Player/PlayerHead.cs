@@ -33,7 +33,7 @@ public class PlayerHead : MonoBehaviour
     public static List<ICharacter> Characters;
     ICharacter _currChar;
 
-    public float XP { get; private set; }
+    public float XP { get; private set; } //??
     public float Gold { get; private set; }
     float _gold = 0;
 
@@ -110,7 +110,7 @@ public class PlayerHead : MonoBehaviour
         }
     }
 
-    public void AddXP(int xp) 
+    public void AddXP(float xp) 
     {
         _currChar.AddXP(xp);
     }

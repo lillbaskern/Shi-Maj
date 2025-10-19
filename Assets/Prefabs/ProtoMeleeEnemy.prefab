@@ -115,6 +115,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _hp: 7
+  _goldYield: 50
+  _xpToDrop: 20
+  _xpSphere: {fileID: 3888090494254579947, guid: 892ad62f3a42c9646bdb7bab9c98121a,
+    type: 3}
 --- !u!114 &577692266907270599
 MonoBehaviour:
   m_ObjectHideFlags: 0

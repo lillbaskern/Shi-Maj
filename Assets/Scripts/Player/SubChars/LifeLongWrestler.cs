@@ -21,17 +21,43 @@ public interface ICharacter
 
 public class Stats
 {
-    public int Strength;
+
+    public Action OnLevelUp;
+
+    public void AddXP(float xp)
+    {
+        XP += xp;
+        if(XP >= XPToNextLevel) 
+        {
+            LevelUp();
+        }
+    }
+
+
+    public void LevelUp()
+    {
+        XPToNextLevel += 70 * Level;
+        XP = 0;
+        Level += 1;
+        OnLevelUp.Invoke();
+    }
+
+
+    public float XP = 0;
+    public float XPToNextLevel = 79f;
+    public int Level = 1;
+
+    public int Strength = 1;
     public int Luck = 1;
-    public float JumpHeight;
-    public float FallSpeed;
-    public float AirSpeed;
-    public float MoveSpeed;
-    public float Acceleration;
-    public float XPGain;
-    public float CritChance;
+    public float JumpHeight = 1;
+    public float FallSpeed = 1;
+    public float AirSpeed = 1;
+    public float MoveSpeed = 1;
+    public float Acceleration = 1;
+    public float XPGainMult = 1;
+    public float CritChance = 1;
     public float CritDamage = 150; //percentage of original attack damage that a crit will do (150% base crit damage)
-    public float ReloadSpeed;
+    public float ReloadSpeed = 1;
     public float ProjectileSize = 1f;
     public int ProjectileQuantity = 1;
     public int ExtraMagSize = 0;
@@ -39,15 +65,13 @@ public class Stats
 
 public class LifeLongWrestler : PlayerMove, ICharacter
 {
-    private int _level;
-    private float _xp;
-    private float _xpToNextLevel;
-
+    Stats _stats;
     public Weapon GetCurrWeapon() => CurrWeapon;
     public string GetName() => _name;
 
     private void Start()
     {
+        _stats = new Stats();
         //the characters you have available are stored in a static list. they will add themselves to the list using sendtocharlist() from playermove
         SendToCharList(this);
     }
@@ -70,26 +94,32 @@ public class LifeLongWrestler : PlayerMove, ICharacter
 
     public int GetLevel()
     {
-        return _level;
+        return _stats.Level;
     }
 
     public float GetXP()
     {
-        return _xp;
+        return _stats.XP;
     }
 
     public void AddXP(float xp)
     {
-        _xp += xp;
-        if (_xp > _xpToNextLevel)
+        _stats.XP += xp;
+        if (_stats.XP > _stats.XPToNextLevel)
         {
             LevelUp();
         }
+
+        float percentOfNextLevel = (_stats.XP / _stats.XPToNextLevel) * 100;
+
+        UIManager.XPChange.Invoke((int) percentOfNextLevel);
     }
 
     public void LevelUp()
     {
-
+        _stats.Level +=  1;
+        _stats.XP = 0;
+        _stats.XPToNextLevel += 100*_stats.Level;//placeholder xptonextlevel calculations
     }
 }
 

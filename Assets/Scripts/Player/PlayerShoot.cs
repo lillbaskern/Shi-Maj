@@ -54,9 +54,21 @@ public class Weapon
     public int Damage { get; protected set; }
     public int MagCapacity { get; protected set; }
     public int AmmoCapacity { get; private set; }
+
+
     public float Range { get; private set; }
     private WaitForSeconds _reloadTime { get; set; }
     private WaitForSeconds _fireRate;
+
+    public void IncreaseMagSize(int increaseValue)
+    {
+        MagCapacity += increaseValue;
+        AmmoCapacity += MagCapacity * 2;
+        WeaponUIEventArgs args = new(this);
+        AmmoUpdate?.Invoke(this, args);
+    }
+
+
 
     public virtual IEnumerator Reload()
     {
@@ -123,7 +135,7 @@ public class PlayerShoot : MonoBehaviour
 
     //weapon variables
     public Weapon CurrWeapon { get; protected set; }
-    private Weapon[] _weapons = new Weapon[3];
+    protected Weapon[] _weapons = new Weapon[3];
     private int _currWeaponIndex = 0;
 
     //these transforms are from where raycasts will fire

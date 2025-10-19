@@ -7,9 +7,20 @@ public class Soldier : PlayerMove, ICharacter
     public string GetName() => _name;
     public Weapon GetCurrWeapon() => CurrWeapon;
 
+    Stats _stats;
+
     private void Start()
     {
+        _stats = new();
+        _stats.OnLevelUp += LevelUp;
+
+
+        _stats.MoveSpeed = 1.1f;
+        float percentOfNextLevel = (_stats.XP / _stats.XPToNextLevel) * 100;
+
         SendToCharList(this);
+        UIManager.XPChange.Invoke((int)percentOfNextLevel);
+        UIManager.XPChange.Invoke(_stats.Level);
     }
     public void CharacterInit()
     {
@@ -37,11 +48,30 @@ public class Soldier : PlayerMove, ICharacter
 
     public void AddXP(float xp)
     {
-        throw new System.NotImplementedException();
+        _stats.AddXP(xp);
+
+        //_stats.XP += xp;
+        //if (_stats.XP > _stats.XPToNextLevel)
+        //{
+        //    LevelUp();
+        //}
+
+        float percentOfNextLevel = (_stats.XP / _stats.XPToNextLevel) * 100;
+
+        UIManager.XPChange.Invoke((int)percentOfNextLevel);
+        UIManager.LvlUpdate(_stats.Level);
     }
 
     public void LevelUp()
     {
-        throw new System.NotImplementedException();
+        _stats.ExtraMagSize += 2;
+
+        for (int i = 0; i < _weapons.Length; i++)
+        {
+            if (_weapons[i] == null) continue; 
+            _weapons[i].IncreaseMagSize(_stats.ExtraMagSize);
+        }
+
+        UIManager.LvlUpdate(_stats.Level);
     }
 }

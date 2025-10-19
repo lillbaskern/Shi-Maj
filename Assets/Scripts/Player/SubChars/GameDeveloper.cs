@@ -42,16 +42,28 @@ public class GameDeveloper : PlayerMove, ICharacter
 
     public void LevelUp()
     {
-        _xp = 0;
+        //_stats.Level += 1;
+        //_stats.XP = 0;
+        //_stats.XPToNextLevel += 70 * _stats.Level;//placeholder xptonextlevel calculations11
 
-        Debug.Log("you leveled up!");
-        //todo:: increase stats
-        //maybe add separate float to track which stats to increase more than others
+        //Debug.Log("you leveled up!");
+        ////todo:: increase stats
+        ////maybe add separate float to track which stats to increase more than others
     }
 
     public void AddXP(float xp)
     {
-        _xp += xp;
-        if (_xp > _xpToNextLevel) LevelUp();
+
+        _stats.AddXP(xp);//this is soo ugly but is a smaller refactor than making an abstract character class
+
+        //_stats.XP += xp;
+        //if (_stats.XP > _stats.XPToNextLevel)
+        //{
+        //    LevelUp();
+        //}
+
+        float percentOfNextLevel = (_stats.XP / _stats.XPToNextLevel) * 100;
+
+        UIManager.XPChange.Invoke((int)percentOfNextLevel);
     }
 }
