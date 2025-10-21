@@ -18,9 +18,13 @@ public class Soldier : PlayerMove, ICharacter
         _stats.MoveSpeed = 1.1f;
         float percentOfNextLevel = (_stats.XP / _stats.XPToNextLevel) * 100;
 
+        Debug.Log(percentOfNextLevel);
+        Debug.Log(_stats.XP);
+
+
         SendToCharList(this);
         UIManager.XPChange.Invoke((int)percentOfNextLevel);
-        UIManager.XPChange.Invoke(_stats.Level);
+        UIManager.LvlUpdate.Invoke(_stats.Level);
     }
     public void CharacterInit()
     {

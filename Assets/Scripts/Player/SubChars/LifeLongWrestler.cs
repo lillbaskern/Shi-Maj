@@ -15,53 +15,9 @@ public interface ICharacter
     public float GetXP();
     public void LevelUp();
     public void AddXP(float xp);
-
     public Weapon GetCurrWeapon();
 }
-
-public class Stats
-{
-
-    public Action OnLevelUp;
-
-    public void AddXP(float xp)
-    {
-        XP += xp;
-        if(XP >= XPToNextLevel) 
-        {
-            LevelUp();
-        }
-    }
-
-
-    public void LevelUp()
-    {
-        XPToNextLevel += 70 * Level;
-        XP = 0;
-        Level += 1;
-        OnLevelUp.Invoke();
-    }
-
-
-    public float XP = 0;
-    public float XPToNextLevel = 79f;
-    public int Level = 1;
-
-    public int Strength = 1;
-    public int Luck = 1;
-    public float JumpHeight = 1;
-    public float FallSpeed = 1;
-    public float AirSpeed = 1;
-    public float MoveSpeed = 1;
-    public float Acceleration = 1;
-    public float XPGainMult = 1;
-    public float CritChance = 1;
-    public float CritDamage = 150; //percentage of original attack damage that a crit will do (150% base crit damage)
-    public float ReloadSpeed = 1;
-    public float ProjectileSize = 1f;
-    public int ProjectileQuantity = 1;
-    public int ExtraMagSize = 0;
-}
+//TODO:: REFACTOR SO LIFELONGWRESTLER, SOLDIER, AND GAMEDEVELOPER ARENT CLASSES NOW THAT CHARACTER DATA IS STORED IN SCRIPTABLEOBJECT CHARACTERSHEET
 
 public class LifeLongWrestler : PlayerMove, ICharacter
 {

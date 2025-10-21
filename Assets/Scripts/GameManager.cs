@@ -19,7 +19,8 @@ public class GameManager : MonoBehaviour
             return;
         }
         Instance = this;
-        PlayerTransform = GameObject.Find("Player").transform;
+
+        if (PlayerTransform == null) return;
 
         Enemies = new List<IEnemy>();
 
